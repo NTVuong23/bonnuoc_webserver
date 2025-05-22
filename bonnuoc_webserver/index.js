@@ -252,17 +252,37 @@ setInterval(
     1000 // 1s = 1000ms // doc cham de de tim loi
 );
 // /////////////////////////++THIẾT LẬP KẾT NỐI WEB++/////////////////////////
-var express = require("express");
-var app = express();
-app.use(express.static("public"));
-app.set("view engine", "ejs");
-app.set("views", "./views");
-var server = require("http").Server(app);
-var io = require("socket.io")(server);
+const express = require('express');
+const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+const mqttHandler = require('./mqtt-handler');
+
+// Khởi tạo MQTT và truyền đối tượng io vào
+mqttHandler.initMQTT(io);
+
+// Thiết lập Socket.IO
+io.on('connection', function(socket) {
+  console.log('Có client kết nối');
+  
+  // Gửi dữ liệu hiện tại khi client kết nối
+  socket.emit('updatedata', mqttHandler.getCurrentData());
+
+  // Xử lý lệnh từ client
+  socket.on('Level_Setpoint', function(data) {
+    mqttHandler.sendCommand('Level_Setpoint', data);
+  });
+  
+  socket.on('Pressure_Setpoint', function(data) {
+    mqttHandler.sendCommand('Pressure_Setpoint', data);
+  });
+  
+  // Các sự kiện khác...
+});
 
 // Sử dụng PORT từ biến môi trường hoặc mặc định 3000
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Server đang chạy tại http://localhost:${PORT}`);
 });
 // Home calling
@@ -334,36 +354,27 @@ io.on("connection", function(socket){
 // Khởi tạo SQL
 var mysql = require('mysql');
 
-// Debug: In đầy đủ biến môi trường
-console.log("==== DEBUG MYSQL ====");
-console.log("MYSQL_URL:", process.env.MYSQL_URL);
-console.log("MYSQLHOST:", process.env.MYSQLHOST);
-console.log("MYSQLPORT:", process.env.MYSQLPORT);
-console.log("MYSQLUSER:", process.env.MYSQLUSER);
-console.log("ROOT_PASS:", process.env.MYSQL_ROOT_PASSWORD ? "Có mật khẩu" : "Không có mật khẩu");
-console.log("DATABASE:", process.env.MYSQL_DATABASE);
-console.log("===================");
-
-// Thử kết nối bằng URL trực tiếp
-var sqlcon;
+// Thêm đoạn này vào đầu file index.js
 try {
-  if (process.env.MYSQL_URL) {
-    console.log("Đang kết nối bằng URL...");
-    sqlcon = mysql.createConnection(process.env.MYSQL_URL);
-  } else {
-    console.log("Đang kết nối bằng thông số riêng lẻ...");
-    sqlcon = mysql.createConnection({
-      host: process.env.MYSQLHOST || "localhost",
-      user: process.env.MYSQLUSER || "root",
-      password: process.env.MYSQL_ROOT_PASSWORD || "",
-      database: process.env.MYSQL_DATABASE || "SQL_PLC",
-      port: parseInt(process.env.MYSQLPORT || "3306"),
-      dateStrings: true
-    });
-  }
+  console.log("==== THÔNG TIN KẾT NỐI DATABASE ====");
+  console.log("Database Host:", process.env.MYSQLHOST || "localhost");
+  console.log("Database Name:", process.env.MYSQL_DATABASE || "SQL_PLC");
+  console.log("Database User:", process.env.MYSQLUSER || "root");
+  console.log("Database Port:", process.env.MYSQLPORT || "3306");
+  console.log("=====================================");
 } catch (e) {
-  console.error("Lỗi tạo kết nối MySQL:", e);
+  console.error("Lỗi khi hiển thị thông tin kết nối:", e);
 }
+
+// Sử dụng chính xác tên các biến môi trường từ Railway
+var sqlcon = mysql.createConnection({
+    host: process.env.MYSQLHOST || "localhost",
+    user: process.env.MYSQLUSER || "root",
+    password: process.env.MYSQLPASSWORD || "",
+    database: process.env.MYSQL_DATABASE || "SQL_PLC", // Chú ý tên biến này
+    port: parseInt(process.env.MYSQLPORT || "3306"),
+    dateStrings: true
+});
 
 // Kiểm tra và tạo bảng alarm nếu chưa tồn tại
 function setupDatabase() {
@@ -751,22 +762,3 @@ function fn_Require_ExcelExport_Alarm(){
         });
     });
 }
-
-// Thêm thư viện MQTT (đã cài đặt trong package.json)
-const mqtt = require('mqtt');
-
-// Cấu hình kết nối MQTT từ biến môi trường
-const mqttHost = process.env.MQTT_HOST || 'e0e2df9662164c61b31be009996f5df6.s1.eu.hivemq.cloud';
-const mqttPort = process.env.MQTT_PORT || '8883';
-const mqttUsername = process.env.MQTT_USERNAME || 'hivemq.webclient.1747940633986';
-const mqttPassword = process.env.MQTT_PASSWORD || 'YB&aSbpi@03?P>E1q5Uh';
-
-// Tạo URL kết nối MQTT
-const mqttUrl = `mqtts://${mqttHost}:${mqttPort}`;
-
-// Tạo client MQTT
-const mqttClient = mqtt.connect(mqttUrl, {
-  username: mqttUsername,
-  password: mqttPassword,
-  rejectUnauthorized: false
-});
