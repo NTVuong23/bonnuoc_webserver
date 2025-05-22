@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["nodejs"]
+
+[phases.install]
+cmds = ["cd bonnuoc_webserver && npm install"]
+
+[start]
+cmd = "cd bonnuoc_webserver && npm start" 

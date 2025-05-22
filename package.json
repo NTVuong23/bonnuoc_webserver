@@ -1,0 +1,12 @@
+{
+  "name": "bonnuoc-project",
+  "version": "1.0.0",
+  "description": "Project wrapper for bonnuoc_webserver",
+  "scripts": {
+    "install": "cd bonnuoc_webserver && npm install",
+    "start": "cd bonnuoc_webserver && npm start"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+} 
