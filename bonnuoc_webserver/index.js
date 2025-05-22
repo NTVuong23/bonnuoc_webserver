@@ -324,7 +324,13 @@ function fn_tag(){
 
 // /////////// GỬI DỮ LIỆU BẢNG TAG ĐẾN CLIENT (TRÌNH DUYỆT) ///////////////
 io.on("connection", function(socket){
+    console.log('Client mới kết nối:', socket.id);
+    
+    // Gửi dữ liệu ngay khi client kết nối
+    fn_tag();
+    
     socket.on("Client-send-data", function(data){
+        console.log('Nhận yêu cầu dữ liệu từ client:', socket.id, data);
         fn_tag(); 
         fn_Alarm_Show();
         fn_Alarm_Search_ByTime();

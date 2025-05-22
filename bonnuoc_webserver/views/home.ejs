@@ -14,11 +14,19 @@
         <script src = "js/FC4_Excel_Export.js"></script>
         <script>
             // Kết nối Socket.IO với URL hiện tại thay vì localhost cố định
-            var socket = io() // Tự động lấy URL từ trang hiện tại
+            var socket = io({
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                reconnectionAttempts: Infinity
+            });
             
             // Thêm handlers để theo dõi kết nối Socket.IO
             socket.on('connect', function() {
                 console.log('Socket.IO đã kết nối! ID:', socket.id);
+                // Yêu cầu dữ liệu ngay khi kết nối
+                socket.emit("Client-send-data", "Yêu cầu dữ liệu ban đầu");
             });
             
             socket.on('disconnect', function() {
@@ -30,7 +38,7 @@
             });
             
             socket.on('updatedata', function(data) {
-                console.log('Nhận dữ liệu từ server:', data);
+                console.log('Nhận dữ liệu tổng hợp từ server:', data);
             });
         </script>
         <!-- ////////////// GỌI CÁC CSS //////////////  -->

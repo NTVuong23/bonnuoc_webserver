@@ -9,6 +9,7 @@ function myTimer()
 function fn_IOFieldDataShow(tag, IOField, tofix)
 {
     socket.on(tag, function(data){
+        console.log(`Nhận dữ liệu tag ${tag}:`, data);
         if (tofix == 0)
         {
             document.getElementById(IOField).value = data;
@@ -28,7 +29,9 @@ function fn_SymbolStatus(ObjectID, SymName, Tag)
     var imglink_3 = "images/Symbol/" + SymName + "_3.png"; // Trạng thái tag = 3
     var imglink_4 = "images/Symbol/" + SymName + "_4.png"; // Trạng thái tag = 4
     var imglink_5 = "images/Symbol/" + SymName + "_5.png"; // Trạng thái tag = 5
+    console.log(`Đăng ký lắng nghe tag ${Tag} cho đối tượng ${ObjectID}`);
     socket.on(Tag, function(data){
+        console.log(`Nhận dữ liệu tag ${Tag} cho đối tượng ${ObjectID}:`, data);
         if (data == 0)
         {
             document.getElementById(ObjectID).src = imglink_0;
