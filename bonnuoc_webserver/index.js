@@ -361,6 +361,8 @@ try {
   console.log("Database Name:", process.env.MYSQL_DATABASE || "SQL_PLC");
   console.log("Database User:", process.env.MYSQLUSER || "root");
   console.log("Database Port:", process.env.MYSQLPORT || "3306");
+  // Debug thông tin mật khẩu (chỉ hiển thị có/không)
+  console.log("Password available:", process.env.MYSQL_ROOT_PASSWORD ? "Yes" : "No");
   console.log("=====================================");
 } catch (e) {
   console.error("Lỗi khi hiển thị thông tin kết nối:", e);
@@ -368,16 +370,12 @@ try {
 
 // Sử dụng chính xác tên các biến môi trường từ Railway
 var sqlcon = mysql.createConnection({
-    host: process.env.MYSQLHOST || "localhost",
+    host: process.env.MYSQLHOST || "mysql-az0h.railway.internal",
     user: process.env.MYSQLUSER || "root",
-    password: process.env.MYSQLPASSWORD || "",
-    database: process.env.MYSQL_DATABASE || "SQL_PLC", // Chú ý tên biến này
+    password: process.env.MYSQL_ROOT_PASSWORD || "WWfgEeUnoxLQlPlBzdgrTOuyueZrINGg", // Sử dụng MYSQL_ROOT_PASSWORD
+    database: process.env.MYSQL_DATABASE || "railway",
     port: parseInt(process.env.MYSQLPORT || "3306"),
-    dateStrings: true,
-    // Thêm các tùy chọn để xử lý lỗi xác thực
-    authPlugins: {
-      mysql_native_password: () => () => Buffer.from(process.env.MYSQLPASSWORD || '')
-    }
+    dateStrings: true
 });
 
 // Kiểm tra và tạo bảng alarm nếu chưa tồn tại
