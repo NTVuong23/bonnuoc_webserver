@@ -352,7 +352,7 @@ io.on("connection", function(socket){
 
 // /////////// CƠ SỞ DỮ LIỆU SQL ///////////////
 // Khởi tạo SQL
-var mysql = require('mysql');
+var mysql = require('mysql2');
 
 // Thêm đoạn này vào đầu file index.js
 try {
