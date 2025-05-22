@@ -15,6 +15,23 @@
         <script>
             // Kết nối Socket.IO với URL hiện tại thay vì localhost cố định
             var socket = io() // Tự động lấy URL từ trang hiện tại
+            
+            // Thêm handlers để theo dõi kết nối Socket.IO
+            socket.on('connect', function() {
+                console.log('Socket.IO đã kết nối! ID:', socket.id);
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('Socket.IO đã ngắt kết nối');
+            });
+            
+            socket.on('connect_error', function(error) {
+                console.error('Lỗi kết nối Socket.IO:', error);
+            });
+            
+            socket.on('updatedata', function(data) {
+                console.log('Nhận dữ liệu từ server:', data);
+            });
         </script>
         <!-- ////////////// GỌI CÁC CSS //////////////  -->
         <link rel="stylesheet" href= "CSS/slidebar.css">

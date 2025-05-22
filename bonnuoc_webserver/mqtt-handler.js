@@ -23,30 +23,54 @@ function initMQTT(socketIo) {
   const mqttPort = process.env.MQTT_PORT || '8883';
   const mqttUsername = process.env.MQTT_USERNAME || 'plc_gateway';
   const mqttPassword = process.env.MQTT_PASSWORD || 'Abc12345@';
-  const mqttUseSSL = process.env.MQTT_USE_SSL === 'true';
+  const mqttUseSSL = process.env.MQTT_USE_SSL !== 'false'; // Mặc định là true
 
   const mqttUrl = `${mqttUseSSL ? 'mqtts' : 'mqtt'}://${mqttHost}:${mqttPort}`;
+  
+  console.log('Kết nối đến MQTT broker:', mqttUrl);
+  console.log('Sử dụng SSL:', mqttUseSSL);
 
   const mqttOptions = {
     username: mqttUsername,
     password: mqttPassword,
     rejectUnauthorized: false,
-    clientId: `bonnuoc_web_${Math.random().toString(16).slice(2, 8)}`
+    clientId: `bonnuoc_web_${Math.random().toString(16).slice(2, 8)}`,
+    connectTimeout: 5000
   };
 
-  mqttClient = mqtt.connect(mqttUrl, mqttOptions);
+  try {
+    mqttClient = mqtt.connect(mqttUrl, mqttOptions);
+    
+    mqttClient.on('connect', () => {
+      console.log('Đã kết nối đến MQTT Broker');
+      console.log('Đăng ký nhận dữ liệu từ topics: plc/data và plc/alarms');
+      mqttClient.subscribe('plc/data', { qos: 1 });
+      mqttClient.subscribe('plc/alarms', { qos: 1 });
+      
+      // Đăng ký với Node-RED gateway để bắt đầu nhận dữ liệu
+      console.log('Gửi yêu cầu dữ liệu đến gateway');
+      mqttClient.publish('plc/request', JSON.stringify({
+        action: 'subscribe',
+        clientId: mqttOptions.clientId
+      }), { qos: 1 });
+    });
+    
+    mqttClient.on('reconnect', () => {
+      console.log('Đang kết nối lại MQTT...');
+    });
 
-  mqttClient.on('connect', () => {
-    console.log('Đã kết nối đến MQTT Broker');
-    mqttClient.subscribe('plc/data', { qos: 1 });
-    mqttClient.subscribe('plc/alarms', { qos: 1 });
-  });
+    mqttClient.on('error', (error) => {
+      console.error('Lỗi kết nối MQTT:', error);
+    });
+    
+    mqttClient.on('offline', () => {
+      console.log('MQTT client bị ngắt kết nối');
+    });
 
-  mqttClient.on('error', (error) => {
-    console.error('Lỗi kết nối MQTT:', error);
-  });
-
-  mqttClient.on('message', handleMQTTMessage);
+    mqttClient.on('message', handleMQTTMessage);
+  } catch (error) {
+    console.error('Lỗi khởi tạo MQTT client:', error);
+  }
 }
 
 // Xử lý tin nhắn MQTT
@@ -64,24 +88,32 @@ function handleMQTTMessage(topic, message) {
       if (io) {
         console.log('Đang gửi dữ liệu đến client qua Socket.IO');
         io.emit('updatedata', plcData);
+        
+        // Phát riêng các giá trị cụ thể để kích hoạt các handler trong FC1_Common.js
+        Object.keys(data).forEach(key => {
+          io.emit(key, data[key]);
+        });
       } else {
         console.log('Chưa có kết nối Socket.IO');
       }
     }
   } catch (error) {
-    console.error('Lỗi xử lý dữ liệu MQTT:', error);
+    console.error('Lỗi xử lý dữ liệu MQTT:', error, 'Raw message:', message.toString());
   }
 }
 
 // Gửi lệnh điều khiển
 function sendCommand(command, value) {
   if (mqttClient && mqttClient.connected) {
-    mqttClient.publish('plc/commands', JSON.stringify({
+    const payload = JSON.stringify({
       command: command,
       value: value
-    }), { qos: 1 });
+    });
+    console.log(`Gửi lệnh đến plc/commands: ${payload}`);
+    mqttClient.publish('plc/commands', payload, { qos: 1 });
     return true;
   }
+  console.log('Không thể gửi lệnh - MQTT không kết nối');
   return false;
 }
 

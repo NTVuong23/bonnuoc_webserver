@@ -255,7 +255,13 @@ setInterval(
 const express = require('express');
 const app = express();
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+// Thêm cấu hình CORS cho Socket.IO
+const io = require('socket.io')(http, {
+  cors: {
+    origin: "*", // Cho phép tất cả các origin
+    methods: ["GET", "POST"]
+  }
+});
 const mqttHandler = require('./mqtt-handler');
 const path = require('path');
 
@@ -271,18 +277,27 @@ mqttHandler.initMQTT(io);
 
 // Thiết lập Socket.IO
 io.on('connection', function(socket) {
-  console.log('Có client kết nối');
+  console.log('Có client kết nối, ID:', socket.id);
   
   // Gửi dữ liệu hiện tại khi client kết nối
-  socket.emit('updatedata', mqttHandler.getCurrentData());
+  const currentData = mqttHandler.getCurrentData();
+  console.log('Dữ liệu hiện tại gửi cho client:', currentData);
+  socket.emit('updatedata', currentData);
 
   // Xử lý lệnh từ client
   socket.on('Level_Setpoint', function(data) {
+    console.log('Nhận lệnh Level_Setpoint:', data);
     mqttHandler.sendCommand('Level_Setpoint', data);
   });
   
   socket.on('Pressure_Setpoint', function(data) {
+    console.log('Nhận lệnh Pressure_Setpoint:', data);
     mqttHandler.sendCommand('Pressure_Setpoint', data);
+  });
+  
+  // Thêm sự kiện ngắt kết nối để log
+  socket.on('disconnect', function() {
+    console.log('Client ngắt kết nối, ID:', socket.id);
   });
   
   // Các sự kiện khác...
