@@ -334,22 +334,70 @@ io.on("connection", function(socket){
 // Khởi tạo SQL
 var mysql = require('mysql');
 
-// Sử dụng biến môi trường hoặc giá trị mặc định cho cấu hình MySQL
+// Thêm đoạn này vào đầu file index.js
+try {
+  console.log("==== THÔNG TIN KẾT NỐI DATABASE ====");
+  console.log("Database Host:", process.env.MYSQLHOST || "localhost");
+  console.log("Database Name:", process.env.MYSQL_DATABASE || "SQL_PLC");
+  console.log("Database User:", process.env.MYSQLUSER || "root");
+  console.log("Database Port:", process.env.MYSQLPORT || "3306");
+  console.log("=====================================");
+} catch (e) {
+  console.error("Lỗi khi hiển thị thông tin kết nối:", e);
+}
+
+// Sử dụng chính xác tên các biến môi trường từ Railway
 var sqlcon = mysql.createConnection({
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "SQL_PLC",
-    dateStrings: true // Hiển thị không có T và Z
+    host: process.env.MYSQLHOST || "localhost",
+    user: process.env.MYSQLUSER || "root",
+    password: process.env.MYSQLPASSWORD || "",
+    database: process.env.MYSQL_DATABASE || "SQL_PLC", // Chú ý tên biến này
+    port: parseInt(process.env.MYSQLPORT || "3306"),
+    dateStrings: true
 });
 
-// Thêm xử lý kết nối MySQL
+// Kiểm tra và tạo bảng alarm nếu chưa tồn tại
+function setupDatabase() {
+  sqlcon.query("SHOW TABLES LIKE 'alarm'", function(err, results) {
+    if (err) {
+      console.error("Lỗi kiểm tra bảng alarm:", err);
+      return;
+    }
+    
+    if (results.length === 0) {
+      // Bảng không tồn tại, tạo mới
+      console.log("Tạo bảng alarm...");
+      const createTableSQL = `
+        CREATE TABLE IF NOT EXISTS alarm (
+          date_time DATETIME,
+          ID VARCHAR(50),
+          Status VARCHAR(10),
+          AlarmName VARCHAR(255)
+        )
+      `;
+      
+      sqlcon.query(createTableSQL, function(err) {
+        if (err) {
+          console.error("Lỗi tạo bảng alarm:", err);
+        } else {
+          console.log("Đã tạo bảng alarm thành công!");
+        }
+      });
+    } else {
+      console.log("Bảng alarm đã tồn tại!");
+    }
+  });
+}
+
+// Thêm đoạn này ngay sau khi kết nối MySQL thành công
 sqlcon.connect(function(err) {
   if (err) {
     console.error('Lỗi kết nối đến MySQL:', err);
+    console.log('Chi tiết lỗi:', err.message);
     console.log('Tiếp tục chạy ứng dụng mà không có cơ sở dữ liệu...');
   } else {
     console.log("Kết nối MySQL thành công!");
+    setupDatabase();
   }
 });
 
