@@ -1,0 +1,195 @@
+/*Màn hình 2*/
+#Screen_Home {
+    position: absolute; 
+    left: 150px; top: 0px; 
+    width: 1370px; height: 725px;
+    background-color: white; 
+    
+}
+#haeder_home {
+    position: absolute; 
+    left: 0px; top: 0px; 
+    width: 1370px; height: 175px;
+    background-color: white; 
+}
+/*Màn hình 2*/
+#back_scr_Home {
+    position: absolute; 
+    left: 0px; top: 0px; 
+    width: 1520px; height: 620px; 
+}
+/*logo*/
+#Logo_scr_home {
+    position: absolute; 
+    left: 20px; top: 10px; 
+    width: 130px; height: 130px; 
+}
+/*logo*/
+#Logo_scr_home_1 {
+    position: absolute; 
+    left: 1180px; top: 10px; 
+    width: 130px; height: 140px; 
+}
+/* #Home_Text_1 {
+    position: absolute; 
+    left: 92px;
+    top: 590px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#Home_Text_2 {
+    position: absolute; 
+    left: 300px;
+    top: 590px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#Home_Text_3 {
+    position: absolute; 
+    left: 550px;
+    top: 590px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#Home_Text_4 {
+    position: absolute; 
+    left: 830px;
+    top: 590px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#Home_Text_5 {
+    position: absolute; 
+    left: 1090px;
+    top: 590px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold; */
+
+/*#Home_Text_6 {
+    position: absolute; 
+    left: 40px;
+    top: 140px; 
+    color:rgb(14, 167, 255);
+    font-size: 24px;
+    font-weight: bold;
+}*/
+#Home_Text_7 {   /*TRƯỜNG*/
+    position: absolute; 
+    left: 310px;
+    top: 10px; 
+    color:BLACK;
+    font-size: 26px;
+}
+#Home_Text_18 {  /*KHOA*/
+    position: absolute; 
+    left: 500px;
+    top: 70px; 
+    color:BLACK;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+#Home_Text_11 {  /*NGANH*/
+    position: absolute; 
+    left: 220px;
+    top: 110px; 
+    color:black;
+    font-size: 26px;
+    font-weight: bold;
+    }
+
+#Home_Text_12 { /*DATN*/
+    position: absolute; 
+    left: 420px;
+    top: 200px; 
+    color:rgb(0, 51, 0);
+    font-size: 50px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}  
+#Home_Text_13 {    /*DE TAI*/
+    position: absolute; 
+    left: 70px;
+    top: 300px; 
+    color:rgb(0, 51, 0);
+    font-size: 35px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+#Home_Text_14 {   /*GVHD*/
+    position: absolute; 
+    left:560px;
+    top: 400px; 
+    color:black;
+    font-size: 27px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+#Home_Text_15 {  /*SVTH1*/
+    position: absolute; 
+    left: 560px;
+    top: 450px; 
+    color: BLACK;
+    font-size: 27px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+#Home_Text_16 {  /*SVTH2*/
+    position: absolute; 
+    left: 875px;
+    top: 500px; 
+    color:black;
+    font-size: 27px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+#Home_Text_8 {
+    position: absolute; 
+    left: 210px;
+    top: 55px; 
+    color:rgb(14, 167, 255);
+    font-size: 30px;
+    font-weight: bold;
+}
+#Home_Text_9 {
+    position: absolute; 
+    left: 210px;
+    top: 100px; 
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+}
+#Home_Text_10 {
+    position: absolute; 
+    left: 210px;
+    top: 140px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+#showScreen {
+    position: absolute; 
+    left: 500px;
+    top: 600px; 
+    color:rgba(0, 0, 0, 0.788);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+
+/*#Home_Text_17 {
+    position: absolute; 
+    left: 480px;
+    top: 440px; 
+    color:bLUE;
+    font-size: 40px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}*/

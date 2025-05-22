@@ -1,0 +1,45 @@
+#header_IT5200 {
+    position: absolute; 
+    left: 150px; top: 0px; 
+    width: 1370px; height: 50px;
+    background-color: rgb(204, 255, 204); 
+}
+#IT5200_Text_1 {
+    position: absolute; 
+    left: 20px;
+    top: 10px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#IT5200_Text_2 {
+    position: absolute; 
+    left: 980px;
+    top: 10px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#IT5200_Text_3 {
+    position: absolute; 
+    left: 170px;
+    top: 50px; 
+    color:black;
+    font-size: 20px;
+    text-align: justify;
+    width: 88%;
+    margin: 0 auto;
+}
+#IT5200_Text_4 {
+    position: absolute; 
+    left: 950px;
+    top: 600px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#IT5200_image {
+    position: absolute; 
+    left: 800px; top: 100px; 
+    width: 700px; height: 500px;
+}

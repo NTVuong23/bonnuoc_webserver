@@ -1,0 +1,373 @@
+#screen_Auto {
+    position: absolute; 
+    left: 150px; top: 0px; 
+    width:1370px; height: 725px;
+    background-color:white; 
+} 
+#back_scr_Auto {
+    position: absolute; 
+    left: 0px; top: 50px; 
+    width: 1000px; height: 675px;
+    background-color: rgb(204, 204, 204); 
+} 
+#back_scr_Auto_1 {
+    position: absolute; 
+    left: 1000px; top: 50px; 
+    width: 370px; height: 675px;
+    background-color: rgb(204, 204, 204); 
+}
+#header_Auto {
+    position: absolute; 
+    left: 0px; top: 0px; 
+    width: 1370px; height: 50px;
+    background-color: rgb(204, 255, 204); 
+}
+#Screen_Auto_1 {
+    position: absolute; 
+    left: 520px; top: 70px; 
+    width: 850px; height: 630px;
+    background-color: rgb(204, 255, 204); 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+} 
+#Screen_Auto_2 {
+    position: absolute; 
+    left: 20px; top: 70px; 
+    width: 450px; height:230px;
+    background-color: rgb(204, 255, 204); 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+} 
+#Screen_Auto_3 {
+    position: absolute; 
+    left: 20px; top: 320px; 
+    width: 450px; height: 380px;
+    background-color: rgb(204, 255, 204); 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+} 
+#Auto_Text_1 {
+    position: absolute; 
+    left: 20px;
+    top: 10px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_2 {
+    position: absolute; 
+    left: 610px;
+    top: 10px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_3 {
+    position: absolute; 
+    left: 120px;
+    top: 190px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_4 {
+    position: absolute; 
+    left: 580px;
+    top: 190px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_5 {
+    position: absolute; 
+    left: 130px;
+    top: 340px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_6 {
+    position: absolute; 
+    left: 400px;
+    top: 340px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_7 {
+    position: absolute; 
+    left:650px;
+    top: 340px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_8 {
+    position: absolute; 
+    left: 70px;
+    top: 580px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_9 {
+    position: absolute; 
+    left: 350px;
+    top: 580px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_10 {
+    position: absolute; 
+    left: 630px;
+    top: 580px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Auto_Text_11 {
+    position: absolute; 
+    left: 110px;
+    top: 10px; 
+    color:black;
+    font-size: 40px;
+    font-weight: bold;
+}
+#Auto_Text_12 {
+    position: absolute; 
+    left: 110px;
+    top: 10px; 
+    color:black;
+    font-size: 40px;
+    font-weight: bold;
+}
+/*Bơm*/
+#scrAuto_Pump {
+    position: absolute; 
+    left: 600px; top: 50px; 
+    width: 170px; height: 100px;
+}
+/*Van*/
+#scrAuto_Valve {
+    position: absolute; 
+    left: 150px; top: 50px; 
+    width: 150px; height: 100px;
+}
+/*Mũi tên hướng lên*/
+#scrAuto_Arow1 {
+    position: absolute; 
+    left: 120px; top: 460px; 
+    width: 80px; height: 80px;
+
+}
+/*Mũi tên hướng xuống*/
+#scrAuto_Arow2 {
+    position: absolute; 
+    left: 400px; top: 460px; 
+    width: 80px; height: 80px;
+
+}
+/*Đèn cảnh báo*/
+#scrAuto_Alarm1 {
+    position: absolute; 
+    left: 650px; top: 450px; 
+    width: 120px; height: 120px;
+    
+}
+
+/*Đèn báo stop*/
+#scrAuto_stop {
+    position: absolute; 
+    left: 125px; top: 250px; 
+    width: 80px; height: 80x;
+
+}
+/* Đèn báo start*/
+#scrAuto_start {
+    position: absolute; 
+    left: 400px; top: 250px; 
+    width: 80px; height: 80px;
+
+}
+
+/*Đèn báo emergency*/
+#scrAuto_emergency {
+    position: absolute; 
+    left: 670px; top: 250px; 
+    width: 80px; height: 80px;
+
+}
+
+#scrAuto_Status_Mode{
+    position: absolute; 
+    left: 830px; top: 5px; 
+    width: 160px; height: 30px;
+    border: black solid 1px;
+    border-radius: 10px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+/*Giá trị setpoint*/
+#ScrAuto_Setpoint_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 250px; top: 70px; 
+    width: 100px; height: 40px;
+}
+/*Nút nhấn setpoint*/
+#Setpoint {
+    position: absolute; 
+    left: 20px;
+    top: 70px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+/*Nút nhấn set PID*/
+#bttAuto_Set_Pid {
+    border: none; 
+    background-color: rgb(97, 104, 125); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 50px; top: 140px;
+}
+
+/*Nút nhấn chế độ tự động*/
+#bttAuto_AutoMode {
+    border: none; 
+    background-color: rgb(22, 191, 229); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px;  
+    left: 40px; top: 70px;
+}
+
+/*Nút nhấn chế độ bằng tay*/
+#bttAuto_ManuMode {
+    border: none; 
+    background-color: rgb(222, 128, 183); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px;  
+    left: 250px; top:70px;
+}
+
+/*Nút nhấn start*/
+#bttAuto_Start {
+    border: none; 
+    background-color: rgb(20, 174, 69); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 40px; top: 170px;
+}
+
+/*Nút nhấn stop*/
+#bttAuto_Stop {
+    border: none; 
+    background-color: rgb(198, 38, 10); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 250px; top: 170px;
+}
+
+
+/*Nút nhấn emergency*/
+#bttAuto_EMG {
+    border: none; 
+    background-color: rgb(248, 248, 7); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 150px; top: 280px;
+}
+/*Nút nhấn LƯU*/
+#btt_scrAuto_Save_sp{
+    border: none; 
+    background-color: rgb(0, 0, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 250px; top: 140px;
+}
+/*Nút nhấn SỬA*/
+#btt_scrAuto_Edit_sp{
+    border: none; 
+    background-color: rgb(255, 0, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 250px; top: 140px;
+}
