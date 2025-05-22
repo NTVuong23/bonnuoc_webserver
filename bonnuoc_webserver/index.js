@@ -257,6 +257,14 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const mqttHandler = require('./mqtt-handler');
+const path = require('path');
+
+// Cấu hình view engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+// Cấu hình để phục vụ tệp tĩnh từ thư mục public
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Khởi tạo MQTT và truyền đối tượng io vào
 mqttHandler.initMQTT(io);
