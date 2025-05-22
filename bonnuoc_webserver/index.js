@@ -577,7 +577,6 @@ function fn_Alarm_Search_ByTime(){
 // /////////////////////////////// BÁO CÁO EXCEL CẢNH BÁO ///////////////////////////////
 const Excel_Alarm = require('exceljs');
 const { CONNREFUSED } = require('dns');
-const path = require('path');
 const fs = require('fs');
 
 function fn_excelExport_Alarm(){
