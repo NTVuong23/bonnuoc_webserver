@@ -742,3 +742,22 @@ function fn_Require_ExcelExport_Alarm(){
         });
     });
 }
+
+// Thêm thư viện MQTT (đã cài đặt trong package.json)
+const mqtt = require('mqtt');
+
+// Cấu hình kết nối MQTT từ biến môi trường
+const mqttHost = process.env.MQTT_HOST || 'e0e2df9662164c61b31be009996f5df6.s1.eu.hivemq.cloud';
+const mqttPort = process.env.MQTT_PORT || '8883';
+const mqttUsername = process.env.MQTT_USERNAME || 'hivemq.webclient.1747940633986';
+const mqttPassword = process.env.MQTT_PASSWORD || 'YB&aSbpi@03?P>E1q5Uh';
+
+// Tạo URL kết nối MQTT
+const mqttUrl = `mqtts://${mqttHost}:${mqttPort}`;
+
+// Tạo client MQTT
+const mqttClient = mqtt.connect(mqttUrl, {
+  username: mqttUsername,
+  password: mqttPassword,
+  rejectUnauthorized: false
+});
