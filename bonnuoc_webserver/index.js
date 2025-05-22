@@ -373,7 +373,11 @@ var sqlcon = mysql.createConnection({
     password: process.env.MYSQLPASSWORD || "",
     database: process.env.MYSQL_DATABASE || "SQL_PLC", // Chú ý tên biến này
     port: parseInt(process.env.MYSQLPORT || "3306"),
-    dateStrings: true
+    dateStrings: true,
+    // Thêm các tùy chọn để xử lý lỗi xác thực
+    authPlugins: {
+      mysql_native_password: () => () => Buffer.from(process.env.MYSQLPASSWORD || '')
+    }
 });
 
 // Kiểm tra và tạo bảng alarm nếu chưa tồn tại
