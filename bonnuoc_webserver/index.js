@@ -334,27 +334,36 @@ io.on("connection", function(socket){
 // Khởi tạo SQL
 var mysql = require('mysql');
 
-// Thêm đoạn này vào đầu file index.js
-try {
-  console.log("==== THÔNG TIN KẾT NỐI DATABASE ====");
-  console.log("Database Host:", process.env.MYSQLHOST || "localhost");
-  console.log("Database Name:", process.env.MYSQL_DATABASE || "SQL_PLC");
-  console.log("Database User:", process.env.MYSQLUSER || "root");
-  console.log("Database Port:", process.env.MYSQLPORT || "3306");
-  console.log("=====================================");
-} catch (e) {
-  console.error("Lỗi khi hiển thị thông tin kết nối:", e);
-}
+// Debug: In đầy đủ biến môi trường
+console.log("==== DEBUG MYSQL ====");
+console.log("MYSQL_URL:", process.env.MYSQL_URL);
+console.log("MYSQLHOST:", process.env.MYSQLHOST);
+console.log("MYSQLPORT:", process.env.MYSQLPORT);
+console.log("MYSQLUSER:", process.env.MYSQLUSER);
+console.log("ROOT_PASS:", process.env.MYSQL_ROOT_PASSWORD ? "Có mật khẩu" : "Không có mật khẩu");
+console.log("DATABASE:", process.env.MYSQL_DATABASE);
+console.log("===================");
 
-// Sử dụng chính xác tên các biến môi trường từ Railway
-var sqlcon = mysql.createConnection({
-    host: process.env.MYSQLHOST || "localhost",
-    user: process.env.MYSQLUSER || "root",
-    password: process.env.MYSQLPASSWORD || "",
-    database: process.env.MYSQL_DATABASE || "SQL_PLC", // Chú ý tên biến này
-    port: parseInt(process.env.MYSQLPORT || "3306"),
-    dateStrings: true
-});
+// Thử kết nối bằng URL trực tiếp
+var sqlcon;
+try {
+  if (process.env.MYSQL_URL) {
+    console.log("Đang kết nối bằng URL...");
+    sqlcon = mysql.createConnection(process.env.MYSQL_URL);
+  } else {
+    console.log("Đang kết nối bằng thông số riêng lẻ...");
+    sqlcon = mysql.createConnection({
+      host: process.env.MYSQLHOST || "localhost",
+      user: process.env.MYSQLUSER || "root",
+      password: process.env.MYSQL_ROOT_PASSWORD || "",
+      database: process.env.MYSQL_DATABASE || "SQL_PLC",
+      port: parseInt(process.env.MYSQLPORT || "3306"),
+      dateStrings: true
+    });
+  }
+} catch (e) {
+  console.error("Lỗi tạo kết nối MySQL:", e);
+}
 
 // Kiểm tra và tạo bảng alarm nếu chưa tồn tại
 function setupDatabase() {
