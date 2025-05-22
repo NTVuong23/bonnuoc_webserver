@@ -13,7 +13,8 @@
         <script src = "js/FileSaver.js"></script>
         <script src = "js/FC4_Excel_Export.js"></script>
         <script>
-            var socket = io("localhost:3000") // IP tĩnh (hoặc IP động, hoặc localhost)
+            // Kết nối Socket.IO với URL hiện tại thay vì localhost cố định
+            var socket = io() // Tự động lấy URL từ trang hiện tại
         </script>
         <!-- ////////////// GỌI CÁC CSS //////////////  -->
         <link rel="stylesheet" href= "CSS/slidebar.css">

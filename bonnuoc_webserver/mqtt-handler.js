@@ -52,15 +52,20 @@ function initMQTT(socketIo) {
 // Xử lý tin nhắn MQTT
 function handleMQTTMessage(topic, message) {
   try {
+    console.log(`Nhận tin nhắn từ topic ${topic}:`, message.toString());
     const data = JSON.parse(message.toString());
     
     if (topic === 'plc/data') {
       // Cập nhật dữ liệu từ MQTT
       Object.assign(plcData, data);
+      console.log('Dữ liệu PLC sau khi cập nhật:', plcData);
       
       // Gửi dữ liệu đến client
       if (io) {
+        console.log('Đang gửi dữ liệu đến client qua Socket.IO');
         io.emit('updatedata', plcData);
+      } else {
+        console.log('Chưa có kết nối Socket.IO');
       }
     }
   } catch (error) {
