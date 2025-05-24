@@ -324,7 +324,7 @@
 #bttAuto_EMG {
     border: none; 
     background-color: rgb(248, 248, 7); 
-    color: rgb(255, 255, 255);   
+    color: rgb(0, 0, 0);   
     text-align: center; 
     display: inline-block;
     font-size: 18px; 
@@ -335,8 +335,27 @@
     border-radius: 20px;
     box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
     width: 150px; height: 60px; 
-    left: 150px; top: 280px;
+    left: 40px; top: 280px;
 }
+
+/*Nút nhấn reset emergency*/
+#bttAuto_Reset_EMG {
+    border: none; 
+    background-color: rgb(0, 178, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 180px; height: 60px; 
+    left: 250px; top: 280px;
+}
+
 /*Nút nhấn LƯU*/
 #btt_scrAuto_Save_sp{
     border: none; 

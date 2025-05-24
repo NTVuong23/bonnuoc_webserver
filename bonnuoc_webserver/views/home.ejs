@@ -256,6 +256,8 @@
                    <button id="bttAuto_Stop" onclick= "socket.emit('cmd_Stop', true);">Dừng</button>
                    <!-- Nút nhấn Emergency -->
                    <button id="bttAuto_EMG" onclick= "socket.emit('cmd_EMG', true);">Khẩn cấp</button>
+                   <!-- Nút nhấn Reset Emergency -->
+                   <button id="bttAuto_Reset_EMG" onclick= "socket.emit('cmd_EMG', false);">Reset Khẩn Cấp</button>
                </div>
             </div>
           
@@ -328,6 +330,10 @@
                     <button id="bttManu_Start_Pump" onclick= "socket.emit('cmd_RunP', true);">Chạy</button>
                     <!-- Nút nhấn STOP -->
                     <button id="bttManu_Stop_Pump" onclick= "socket.emit('cmd_StopP', true);">Dừng</button>
+                    <!-- Nút nhấn khẩn cấp -->
+                    <button id="bttManu_EMG" onclick= "socket.emit('cmd_EMG', true);">Khẩn cấp</button>
+                    <!-- Nút nhấn Reset Emergency -->
+                    <button id="bttManu_Reset_EMG" onclick= "socket.emit('cmd_EMG', false);">Reset Khẩn Cấp</button>
                </div>
             </div>
             <!-- //////////////Code cho màn hình ghi dữ liệu xuống SQL////////////// -->

@@ -256,7 +256,7 @@ function fn_read_data_scan(){
     try {
         if (plcConnected) {
             // Chỉ đọc dữ liệu từ PLC nếu đã kết nối
-            conn_plc.readAllItems(valuesReady);
+    conn_plc.readAllItems(valuesReady);
         } else {
             console.log("Bỏ qua đọc PLC do không có kết nối");
         }
@@ -887,7 +887,7 @@ function fn_excelExport_Alarm(){
     worksheet.getCell(`F${totalNumberOfRows+4}`).value = '(Ký, ghi rõ họ tên)';
     worksheet.getCell(`F${totalNumberOfRows+3}`).style = { font:{bold: true, italic: false},alignment: {horizontal:'center',vertical: 'middle',wrapText: false}} ;
     worksheet.getCell(`F${totalNumberOfRows+4}`).style = { font:{bold: false, italic: true},alignment: {horizontal:'center',vertical: 'middle',wrapText: false}} ;
-
+     
     // =====================THỰC HIỆN XUẤT DỮ LIỆU EXCEL=====================
     // Tạo thư mục Report nếu chưa tồn tại
     try {
@@ -897,15 +897,15 @@ function fn_excelExport_Alarm(){
             fs.mkdirSync(reportDir, { recursive: true });
         }
         
-        // Export Link
-        var currentTime = year + "_" + month + "_" + date + "_" + hours + "h" + minutes + "m" + seconds + "s";
-        var saveasDirect = "Report/Report_" + currentTime + ".xlsx";
-        SaveAslink = saveasDirect; // Send to client
+    // Export Link
+    var currentTime = year + "_" + month + "_" + date + "_" + hours + "h" + minutes + "m" + seconds + "s";
+    var saveasDirect = "Report/Report_" + currentTime + ".xlsx";
+    SaveAslink = saveasDirect; // Send to client
         var booknameLink = path.join(__dirname, 'public', saveasDirect);
-        
-        var Bookname = "Report_" + currentTime + ".xlsx";
-        // Write book name
-        workbook.xlsx.writeFile(booknameLink)
+     
+    var Bookname = "Report_" + currentTime + ".xlsx";
+    // Write book name
+    workbook.xlsx.writeFile(booknameLink)
             .then(() => {
                 console.log('File Excel đã được lưu thành công tại:', booknameLink);
             })
@@ -926,7 +926,6 @@ function fn_excelExport_Alarm(){
     return [SaveAslink, Bookname]
 }
 
-// =====================TRUYỀN NHẬN DỮ LIỆU VỚI TRÌNH DUYỆT=====================
 // Hàm chức năng truyền nhận dữ liệu với trình duyệt
 function fn_Require_ExcelExport_Alarm(){
     io.on("connection", function(socket){

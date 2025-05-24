@@ -19,10 +19,10 @@ const plcData = {
   Running_Pump: 0,
   Valve_Solenoid: 0,
   Emergency: false,
-  Auto_Mode: false,
+  Auto_Mode: true, // Mặc định chế độ tự động
   Manu_Mode: false,
   Stt_Start_Light_Green: 0,
-  Stt_Stop_Light_Red: 0,
+  Stt_Stop_Light_Red: 0, // Mặc định là 0 để không ở trạng thái dừng khi khởi động
   Stt_EMG_Light_yellow: 0,
   Over_Pressure: 0,
   Lack_of_Pressure: 0,
@@ -116,9 +116,9 @@ function handleMQTTMessage(topic, message) {
     const data = JSON.parse(message.toString());
     
     if (topic === 'plc/data') {
-      // Kiểm tra xem có đang ở trạng thái dừng hay khẩn cấp không
-      if (plcData.Stt_Stop_Light_Red == 1 || plcData.Emergency == true) {
-        console.log('Hệ thống đang ở trạng thái dừng hoặc khẩn cấp, bỏ qua cập nhật dữ liệu');
+      // Kiểm tra xem có đang ở trạng thái khẩn cấp không (bỏ kiểm tra Stt_Stop_Light_Red)
+      if (plcData.Emergency == true) {
+        console.log('Hệ thống đang ở trạng thái khẩn cấp, bỏ qua cập nhật dữ liệu');
         return;
       }
       
@@ -188,6 +188,7 @@ function handleMQTTMessage(topic, message) {
       
       if (data.Emergency !== undefined) {
         plcData.Stt_EMG_Light_yellow = data.Emergency ? 1 : 0;
+        plcData.Emergency = data.Emergency; // Cập nhật trạng thái Emergency
         
         // Nếu có tín hiệu khẩn cấp, dừng toàn bộ hệ thống
         if (data.Emergency) {
@@ -206,13 +207,14 @@ function handleMQTTMessage(topic, message) {
         plcData.Value_Vollt_Actual = Math.round(plcData.Value_Vollt_Actual * 100) / 100;
       }
       
-      // Giá trị mặc định cho các thông số khác nếu không có và không trong trạng thái dừng
-      if (plcData.Stt_Stop_Light_Red !== 1 && plcData.Manu_Mode !== true) {
-        // Chỉ áp dụng logic tự động khi không ở chế độ thủ công
+      // Giá trị mặc định cho các thông số khác nếu không có và không trong trạng thái khẩn cấp
+      if (!plcData.Emergency && plcData.Manu_Mode !== true) {
+        // Chỉ áp dụng logic tự động khi không ở chế độ thủ công và không khẩn cấp
         plcData.Running_Pump = plcData.Running_Pump || (data.Sensors_Pressure > 0.5 ? 1 : 0); // Bơm chạy nếu áp suất > 0.5 bar
         plcData.Valve_Solenoid = plcData.Valve_Solenoid || (data.Sensors_Level > 50 ? 0 : 1); // Van mở khi mực nước < 50%
         plcData.Stt_Start_Light_Green = data.Auto_Mode || (data.Sensors_Pressure > 0 ? 1 : 0); // Đèn xanh khi áp suất > 0
-        plcData.Stt_Stop_Light_Red = plcData.Stt_Stop_Light_Red || (data.Emergency ? 1 : 0);
+        // Chỉ bật đèn đỏ nếu có tính hiệu khẩn cấp
+        plcData.Stt_Stop_Light_Red = data.Emergency === true ? 1 : plcData.Stt_Stop_Light_Red;
       }
       
       plcData.Over_Pressure = data.Sensors_Pressure > 3 ? 1 : 0; // Quá áp suất khi > 3 bar
@@ -377,6 +379,9 @@ function updateLocalState(command, value) {
         plcData.Sensors_Pressure_Per = 0;
         plcData.Pressure = 0;
         plcData.Pressure_Input = 0;
+      } else {
+        // Khi hủy trạng thái khẩn cấp, đặt lại trạng thái đèn dừng về 0
+        plcData.Stt_Stop_Light_Red = 0;
       }
       
       if (io) {

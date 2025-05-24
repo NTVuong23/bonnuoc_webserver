@@ -366,8 +366,8 @@
     border: black solid 1px;
     border-radius: 20px;
     box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
-    width: 120px; height: 60px; 
-    left: 280px; top: 280px;
+    width: 150px; height: 60px; 
+    left: 250px; top: 280px;
 }
 /*Nút nhấn LƯU*/
 #btt_scrManu_Save_sp{
@@ -402,4 +402,40 @@
     box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
     width: 150px; height: 60px; 
     left: 250px; top: 140px;
+}
+
+/*Nút nhấn khẩn cấp*/
+#bttManu_EMG {
+    border: none; 
+    background-color: rgb(248, 248, 7); 
+    color: rgb(0, 0, 0);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 150px; height: 60px; 
+    left: 40px; top: 370px;
+}
+
+/*Nút nhấn reset khẩn cấp*/
+#bttManu_Reset_EMG {
+    border: none; 
+    background-color: rgb(0, 178, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 180px; height: 60px; 
+    left: 250px; top: 370px;
 }
