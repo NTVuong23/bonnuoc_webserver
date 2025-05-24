@@ -31,9 +31,12 @@ conn_plc.initiateConnection({
   port: process.env.PLC_PORT || 102, 
   host: process.env.PLC_HOST || '192.168.0.1', 
   rack: parseInt(process.env.PLC_RACK || 0), 
-  slot: parseInt(process.env.PLC_SLOT || 1)
+  slot: parseInt(process.env.PLC_SLOT || 1),
+  timeout: 5000 // Thêm timeout để không chờ quá lâu
 }, PLC_connected);
 
+// Flag theo dõi trạng thái kết nối PLC
+let plcConnected = false;
 
 // Bảng tag trong Visual studio code
 var tags_list = { 
@@ -133,8 +136,15 @@ var tags_list = {
 // GỬI DỮ LIỆu TAG CHO PLC
 function PLC_connected(err) {
     if (typeof(err) !== "undefined") {
-        console.log(err); // Hiển thị lỗi nếu không kết nối đƯỢc với PLC
+        console.log("Lỗi kết nối PLC:", err);
+        console.log("Chuyển sang chế độ chỉ sử dụng MQTT");
+        plcConnected = false;
+    } else {
+        console.log("Đã kết nối thành công với PLC");
+        plcConnected = true;
     }
+    
+    // Vẫn tiếp tục thiết lập tags để sẵn sàng khi PLC kết nối lại
     conn_plc.setTranslationCB(function(tag) {return tags_list[tag];});  // Đưa giá trị đọc lên từ PLC và mảng
     
     conn_plc.addItems([
@@ -243,7 +253,19 @@ function valuesReady(anythingBad, values) {
 }
 // Hàm chức năng scan giá trị
 function fn_read_data_scan(){
-    conn_plc.readAllItems(valuesReady);
+    try {
+        if (plcConnected) {
+            // Chỉ đọc dữ liệu từ PLC nếu đã kết nối
+            conn_plc.readAllItems(valuesReady);
+        } else {
+            console.log("Bỏ qua đọc PLC do không có kết nối");
+        }
+    } catch (error) {
+        console.error("Lỗi khi đọc dữ liệu PLC:", error);
+        plcConnected = false;
+    }
+    
+    // Vẫn xử lý alarm dựa trên dữ liệu đã có (từ MQTT hoặc PLC)
     fn_Alarm_Manage();
 }
 // Time cập nhật mỗi 1s
@@ -347,27 +369,151 @@ function valuesWritten(anythingBad) {
 io.on("connection", function(socket){
     // ///////////MÀN CHẾ ĐỘ TỰ ĐỘNG ///////////
     // Nút nhấn chế độ tự động
-    socket.on("cmd_Auto", function(data){conn_plc.writeItems('btt_Auto', data, valuesWritten);});
+    socket.on("cmd_Auto", function(data){
+        // Ưu tiên gửi lệnh qua MQTT 
+        if (mqttHandler) {
+            console.log('Gửi lệnh Auto qua MQTT:', data);
+            mqttHandler.sendCommand('btt_Auto', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('btt_Auto', data, valuesWritten);
+        }
+    });
+    
     // Nút nhấn chế độ bằng tay
-    socket.on("cmd_Manu", function(data){conn_plc.writeItems('btt_Manu', data, valuesWritten);});
+    socket.on("cmd_Manu", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh Manu qua MQTT:', data);
+            mqttHandler.sendCommand('btt_Manu', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('btt_Manu', data, valuesWritten);
+        }
+    });
+    
     // Nút nhấn chạy hệ thống chế độ tự động
-    socket.on("cmd_Start", function(data){conn_plc.writeItems('Btt_Auto_Start', data, valuesWritten);});
+    socket.on("cmd_Start", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh Start qua MQTT:', data);
+            mqttHandler.sendCommand('Btt_Auto_Start', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('Btt_Auto_Start', data, valuesWritten);
+        }
+    });
+    
     // Nút nhấn dừng hệ thống chế độ tự động
-    socket.on("cmd_Stop", function(data){conn_plc.writeItems('Btt_Auto_Stop', data, valuesWritten);});
+    socket.on("cmd_Stop", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh Stop qua MQTT:', data);
+            mqttHandler.sendCommand('Btt_Auto_Stop', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('Btt_Auto_Stop', data, valuesWritten);
+        }
+    });
+    
     // Nút nhấn khẩn cấp
-    socket.on("cmd_EMG", function(data){conn_plc.writeItems('Btt_Emergency', data, valuesWritten);});
+    socket.on("cmd_EMG", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh Emergency qua MQTT:', data);
+            mqttHandler.sendCommand('Btt_Emergency', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('Btt_Emergency', data, valuesWritten);
+        }
+    });
+    
     // ///////////MÀN CHẾ ĐỘ BẰNG TAY ///////////
     // Mở van 
-    socket.on("cmd_OpenV", function(data){conn_plc.writeItems('btt_Valve_Open', data, valuesWritten);});
+    socket.on("cmd_OpenV", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh OpenV qua MQTT:', data);
+            mqttHandler.sendCommand('btt_Valve_Open', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('btt_Valve_Open', data, valuesWritten);
+        }
+    });
+    
     // Đóng van 
-    socket.on("cmd_CloseV", function(data){conn_plc.writeItems('btt_Valve_Close', data, valuesWritten);});
+    socket.on("cmd_CloseV", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh CloseV qua MQTT:', data);
+            mqttHandler.sendCommand('btt_Valve_Close', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('btt_Valve_Close', data, valuesWritten);
+        }
+    });
+    
     // Chạy Pump
-    socket.on("cmd_RunP", function(data){conn_plc.writeItems('btt_Pump_Run', data, valuesWritten);});
+    socket.on("cmd_RunP", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh RunP qua MQTT:', data);
+            mqttHandler.sendCommand('btt_Pump_Run', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('btt_Pump_Run', data, valuesWritten);
+        }
+    });
+    
     // Dừng Pump
-    socket.on("cmd_StopP", function(data){conn_plc.writeItems('btt_Pump_Stop', data, valuesWritten);});
+    socket.on("cmd_StopP", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Gửi lệnh StopP qua MQTT:', data);
+            mqttHandler.sendCommand('btt_Pump_Stop', data);
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('btt_Pump_Stop', data, valuesWritten);
+        }
+    });
 
     // Ghi dữ liệu từ IO field setpoint
-    socket.on("cmd_Edit_Data", function(data){conn_plc.writeItems('Level_Setpoint',data, valuesWritten);});
+    socket.on("cmd_Edit_Data", function(data){
+        // Ưu tiên gửi lệnh qua MQTT
+        if (mqttHandler) {
+            console.log('Cập nhật Level_Setpoint qua MQTT:', data);
+            // Cập nhật giá trị trong bộ nhớ local
+            mqttHandler.getCurrentData().Level_Setpoint = parseFloat(data);
+            // Gửi lệnh qua MQTT
+            mqttHandler.sendCommand('Level_Setpoint', parseFloat(data));
+            
+            // Phát sóng ngay lập tức cho tất cả client để cập nhật giao diện
+            io.emit('Level_Setpoint', parseFloat(data));
+        }
+        
+        // Gửi lệnh đến PLC nếu có kết nối
+        if (plcConnected) {
+            conn_plc.writeItems('Level_Setpoint', data, valuesWritten);
+        }
+    });
 
     // Ghi dữ liệu từ IO field PID
     socket.on("cmd_Edit_Data_PID", function(data){

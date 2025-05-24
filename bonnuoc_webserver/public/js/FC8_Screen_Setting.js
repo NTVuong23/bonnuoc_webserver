@@ -16,8 +16,11 @@ function fn_scrAuto_SaveBtt(){
     // Cho tag đang sửa dữ liệu về 0
     Auto_Scr_data_edditting = false; 
                         // Gửi dữ liệu cần sửa xuống PLC
-    var Edit_Setpoint=document.getElementById("ScrAuto_Setpoint_Level").value;
-    socket.emit('cmd_Edit_Data', Edit_Setpoint);
+    var Edit_Setpoint = document.getElementById("ScrAuto_Setpoint_Level").value;
+    // Chuyển đổi sang số thực trước khi gửi
+    var numericValue = parseFloat(Edit_Setpoint);
+    console.log("Gửi giá trị Level_Setpoint:", numericValue);
+    socket.emit('cmd_Edit_Data', numericValue);
     alert('Dữ liệu đã được lưu!');
     // Vô hiệu hoá chức năng sửa của các IO Field
     document.getElementById("ScrAuto_Setpoint_Level").disabled = true;  
@@ -42,7 +45,7 @@ function fn_scrAuto_IOField_IO(tag, IOField, tofix)
 var Manu_Scr_data_edditting = false;
 function fn_scrManu_EditBtt(){
     // Cho hiển thị nút nhấn lưu
-    fn_DataEdit('btt_scrManu_Save','btt_scrManu_Edit');
+    fn_DataEdit('btt_scrManu_Save_sp','btt_scrManu_Edit_sp');
     // Cho tag báo đang sửa dữ liệu lên giá trị true
     Manu_Scr_data_edditting = true; 
     // Kích hoạt chức năng sửa của các IO Field
@@ -51,12 +54,15 @@ function fn_scrManu_EditBtt(){
 ///// CHƯƠNG TRÌNH CON NÚT NHẤN LƯU //////
 function fn_scrManu_SaveBtt(){
     // Cho hiển thị nút nhấn sửa
-    fn_DataEdit('btt_scrManu_Edit','btt_scrManu_Save');
+    fn_DataEdit('btt_scrManu_Edit_sp','btt_scrManu_Save_sp');
     // Cho tag đang sửa dữ liệu về 0
     Manu_Scr_data_edditting = false; 
                         // Gửi dữ liệu cần sửa xuống PLC
-    var Edit_Setpoint_1=document.getElementById("ScrManu_Setpoint_Level").value;
-    socket.emit('cmd_Edit_Data',Edit_Setpoint_1);
+    var Edit_Setpoint_1 = document.getElementById("ScrManu_Setpoint_Level").value;
+    // Chuyển đổi sang số thực trước khi gửi
+    var numericValue = parseFloat(Edit_Setpoint_1);
+    console.log("Gửi giá trị Level_Setpoint:", numericValue);
+    socket.emit('cmd_Edit_Data', numericValue);
     alert('Dữ liệu đã được lưu!');
     // Vô hiệu hoá chức năng sửa của các IO Field
     document.getElementById("ScrManu_Setpoint_Level").disabled = true;  
