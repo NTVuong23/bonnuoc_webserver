@@ -1,0 +1,5 @@
+[build] 
+builder = "nixpacks"  
+watchPatterns = ["bonnuoc_webserver/**"] 
+[deploy] 
+startCommand = "cd bonnuoc_webserver && node index.js" 

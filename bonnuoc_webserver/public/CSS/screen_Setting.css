@@ -1,0 +1,491 @@
+
+#Screen_Setting_1 {
+    position: absolute; 
+    left: 150px; top: 0px; 
+    width: 1370px; height: 725px;
+    background-color: white; 
+} 
+#scr_setting1_header {
+    position: absolute;     
+    left: 0px; top: 0px; 
+    width: 1370px; height: 50px;
+    background-color: rgb(204, 255, 204); 
+} 
+#scr_Set_Params {
+    position: absolute; 
+    left: 170px; top: 90px; 
+    width: 900px; height: 600px; 
+    border: black solid 1px;
+    border-radius: 0px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+} 
+#Setting_Text_1 {
+    position: absolute; 
+    left: 20px;
+    top: 10px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+/*Giá trị đặt áp suất thực tế thời gian*/
+#set_SP_Pressure_1 {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 500px; top: 175px; 
+    width: 70px; height: 35px;
+}
+
+/*Giá trị Flow thực tế thời gian*/
+#set_Interval_SP_1 {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 1000px; top: 155px; 
+    width: 70px; height: 35px;
+}
+
+/*Giá trị áp suất thực tế thời gian*/
+#set_SP_Pressure_2 {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 600px; top: 285px; 
+    width: 70px; height:35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_Interval_SP_2 {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 1000px; top: 285px; 
+    width: 70px; height: 35px;
+}
+
+/*Giá trị Level thực tế thời gian*/
+#set_SP_Pressure_3 {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 600px; top: 420px; 
+    width: 70px; height: 35px;
+
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_Interval_SP_3 {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 1000px; top: 420px; 
+    width: 70px; height: 35px;
+}
+
+/*Nút nhấn LƯU*/
+#btt_scrAuto_Save {
+    border: none; 
+    background-color: rgb(22, 84, 229); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 0px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 100px; height: 50px; 
+    left: 1100px; top: 500px;
+   
+}
+/*Nút nhấn SỬA*/
+#btt_scrAuto_Edit {
+    border: none; 
+    background-color: rgb(22, 84, 229); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 0px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 100px; height: 50px; 
+    left: 1100px; top: 500px;
+    
+}
+
+/*Giá trị đặt áp suất thực tế thời gian*/
+#set_PID_Gain_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 270px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị áp suất thực tế thời gian*/
+#set_PID_Ti_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 335px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị Level thực tế thời gian*/
+#set_PID_Td_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 395px; 
+    width: 100px; height:35px;
+}
+
+
+/*Giá trị Flow thực tế thời gian*/
+#set_PID_TdFiltRatio_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 460px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_PID_PWeighting_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 522px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_PID_DWeighting_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 588px; 
+    width: 100px; height: 35px;
+}
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_PID_Cycle_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 390px; top: 646px; 
+    width: 100px; height: 35px;
+}
+/*PRESSURE*/
+/*Giá trị đặt áp suất thực tế thời gian*/
+#set_PID_Gain_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 270px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị áp suất thực tế thời gian*/
+#set_PID_Ti_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 335px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị Level thực tế thời gian*/
+#set_PID_Td_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 395px; 
+    width: 100px; height:35px;
+}
+
+
+/*Giá trị Flow thực tế thời gian*/
+#set_PID_TdFiltRatio_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 460px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_PID_PWeighting_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 522px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_PID_DWeighting_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 588px; 
+    width: 100px; height: 35px;
+}
+/*Giá trị điện áp bơm thực tế thời gian*/
+#set_PID_Cycle_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 565px; top: 646px; 
+    width: 100px; height: 35px;
+}
+/* GIÁ TRỊ RETAIN PID*/
+/*Giá trị đặt áp suất thực tế thời gian*/
+#Retain_PID_Gain_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 270px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị áp suất thực tế thời gian*/
+#Retain_PID_Ti_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 335px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị Level thực tế thời gian*/
+#Retain_PID_Td_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 395px; 
+    width: 100px; height:35px;
+}
+
+
+/*Giá trị Flow thực tế thời gian*/
+#Retain_PID_TdFiltRatio_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 460px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#Retain_PID_PWeighting_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 522px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#Retain_PID_DWeighting_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 588px; 
+    width: 100px; height: 35px;
+}
+/*Giá trị điện áp bơm thực tế thời gian*/
+#Retain_PID_Cycle_Level {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 745px; top: 646px; 
+    width: 100px; height: 35px;
+}
+/*PRESSURE*/
+/*Giá trị đặt áp suất thực tế thời gian*/
+#Retain_PID_Gain_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 270px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị áp suất thực tế thời gian*/
+#Retain_PID_Ti_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 335px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị Level thực tế thời gian*/
+#Retain_PID_Td_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 395px; 
+    width: 100px; height:35px;
+}
+
+
+/*Giá trị Flow thực tế thời gian*/
+#Retain_PID_TdFiltRatio_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 460px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#Retain_PID_PWeighting_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 522px; 
+    width: 100px; height: 35px;
+}
+
+/*Giá trị điện áp bơm thực tế thời gian*/
+#Retain_PID_DWeighting_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 588px; 
+    width: 100px; height: 35px;
+}
+/*Giá trị điện áp bơm thực tế thời gian*/
+#Retain_PID_Cycle_Pressure {
+    background-color: #fff;
+    color: black;
+    font-size: 25px;
+    text-align: center;
+    position: absolute; 
+    left: 930px; top: 646px; 
+    width: 100px; height: 35px;
+}
+/*Nút nhấn LƯU*/
+#btt_scrSet_PID_Save {
+    border: none; 
+    background-color: rgb(0, 0, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 0px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 100px; height: 50px; 
+    left: 170px; top: 90px;
+}
+/*Nút nhấn SỬA*/
+#btt_scrSet_PID_Edit {
+    border: none; 
+    background-color:  rgb(255, 0, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    border-radius: 0px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 100px; height: 50px; 
+    left: 170px; top: 90px;
+}
+/*Nút nhấn chế độ bằng tay*/
+#bttSetting_Exit {
+    border: none; 
+    background-color:  rgb(255, 0, 0); 
+    color: rgb(255, 255, 255);   
+    text-align: center; 
+    display: inline-block;
+    font-size: 18px; 
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; 
+    border: black solid 1px;
+    /* border-radius: 20px; */
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+    width: 50px; height: 50px; 
+    left: 1025px; top: 90px;
+}

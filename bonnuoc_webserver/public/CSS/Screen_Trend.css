@@ -1,0 +1,265 @@
+/*header của man hình trend*/
+#header_Trend_Level {
+    position: absolute; 
+    left: 150px; top: 0px; 
+    width: 1370px; height: 50px;
+    background-color: rgb(204,255,204);
+}
+#Trend_Level_Text_1 {
+    position: absolute; 
+    left: 20px;
+    top: 5px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Level_Text_2 {
+    position: absolute; 
+    left: 620px;
+    top: 5px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Level_Text_3 {
+    position: absolute; 
+    left: 20px;
+    top: 30px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Level_Text_4 {
+    position: absolute; 
+    left: 200px;
+    top: 385px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Level_Text_5 {
+    position: absolute; 
+    left: 250px;
+    top: 650px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Level_Text_6 {
+    position: absolute; 
+    left: 970px;
+    top: 650px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Pressure_Text_1 {
+    position: absolute; 
+    left: 200px;
+    top:390px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+#Trend_Pressure_Text_2 {
+    position: absolute; 
+    left: 20px;
+    top: 35px; 
+    color:black;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+/*Màn hình đồ thị */
+#Screen_Trend_1 {
+    position: absolute; 
+    left: 170px; top: 200px; 
+    width: 600px; height: 430px;
+    border: white solid 1px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+/*Màn hình đồ thị */
+#Screen_Trend_2 {
+    position: absolute; 
+    left: 850px; top: 200px; 
+    width: 600px; height: 430px;
+    border: white solid 1px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#scrTrend_Level_Status_Mode{
+    position: absolute; 
+    left: 1000px; top: 5px; 
+    width: 160px; height: 30px;
+    border: black solid 1px;
+    border-radius: 10px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+/*Nút nhấn Trend Pressure*/
+#btt_Trend_Pressure {
+    position: absolute; 
+    left: 1150px;
+    top: 160px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+/*Nút nhấn Trend Level*/
+#btt_Trend_Level {
+    position: absolute; 
+    left: 1150px;
+    top: 160px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+/*css cho các div phía trên màn hình đồ thị*/
+#div1_Trend_Level {
+    position: absolute; 
+    left: 160px; top: 60px; 
+    width: 330px; height: 100px;
+    background-color:rgb(249, 248, 167) ; 
+    border: rgb(249, 248, 167) 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div1_image {
+    position: absolute; 
+    left: 10px; top: 40px; 
+    width: 50px; height:50px;
+    border: white solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div1_text1 {
+    position: absolute; 
+    left: 50px;
+    top: 10px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#ScrTrend_Setpoint_Level {
+    position: absolute; 
+    left: 120px; top: 45px; 
+    width: 100px; height:40px;
+    background-color: white; 
+    color:black;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+/*div 2*/
+#div2_Trend_Level {
+    position: absolute; 
+    left: 500px; top: 60px; 
+    width: 330px; height: 100px;
+    background-color: lightgreen; 
+    border: lightgreen 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div2_image {
+    position: absolute; 
+    left: 10px; top: 40px; 
+    width: 50px; height:50px;
+    background-color: white; 
+    border: white solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div1_text2 {
+    position: absolute; 
+    left: 80px;
+    top: 10px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#ScrTrend_Actual_Level {
+    position: absolute; 
+    left: 120px; top: 45px; 
+    width: 100px; height:40px;
+    background-color: white; 
+    color:black;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+/*div 3*/
+#div3_Trend_Level {
+    position: absolute; 
+    left: 840px; top: 60px; 
+    width: 330px; height: 100px;
+    background-color: rgb(246, 205, 128); 
+    border: rgb(246, 205, 128) 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div3_image {
+    position: absolute; 
+    left: 10px; top: 40px; 
+    width: 50px; height:50px;
+    background-color: white; 
+    border: white solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div1_text4 {
+    position: absolute; 
+    left: 80px;
+    top: 10px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#ScrTrend_Actual_Pressure {
+    position: absolute; 
+    left: 120px; top: 45px; 
+    width: 100px; height:40px;
+    background-color: white; 
+    color:black;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
+/*div 4*/
+#div4_Trend_Level {
+    position: absolute; 
+    left: 1180px; top: 60px; 
+    width: 330px; height: 100px;
+    background-color: lightblue; 
+    border: lightblue 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div4_image {
+    position: absolute; 
+    left: 10px; top: 40px; 
+    width: 50px; height:50px;
+    background-color: orange; 
+    border: lightblue solid 1px;
+    border-radius: 20px;
+    box-shadow: -4px 4px 6px rgba(0, 0, 0, 0.6);
+}
+#div1_text6 {
+    position: absolute; 
+    left: 100px;
+    top: 10px; 
+    color:black;
+    font-size: 24px;
+    font-weight: bold;
+}
+#ScrTrend_Pump_Voltage {
+    position: absolute; 
+    left: 120px; top: 45px; 
+    width: 100px; height:40px;
+    background-color: white; 
+    color:black;
+    border-radius: 10px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+}
