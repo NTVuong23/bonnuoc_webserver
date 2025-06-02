@@ -134,7 +134,7 @@ function initMQTT(socketIo) {
       }
 
       // Bắt đầu simulation nếu không nhận được dữ liệu MQTT trong thời gian quy định
-      const waitTime = isRailway ? 15000 : 10000; // Railway cần thời gian dài hơn
+      const waitTime = isRailway ? 10000 : 10000; // Giảm thời gian chờ cho Railway
       setTimeout(() => {
         if (!dataReceived && !simulationMode) {
           console.log(`⚠️ Không nhận được dữ liệu từ MQTT trong ${waitTime/1000} giây`);
@@ -142,6 +142,16 @@ function initMQTT(socketIo) {
           startSimulation();
         }
       }, waitTime);
+
+      // Trên Railway, bắt đầu simulation ngay lập tức nếu không có dữ liệu sau 5 giây
+      if (isRailway) {
+        setTimeout(() => {
+          if (!dataReceived && !simulationMode) {
+            console.log('🚀 Railway: Force start simulation mode để đảm bảo demo hoạt động');
+            startSimulation();
+          }
+        }, 5000);
+      }
     });
     
     mqttClient.on('reconnect', () => {
