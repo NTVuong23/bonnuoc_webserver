@@ -1,0 +1,135 @@
+[
+    {
+        "id": "plc_data_flow",
+        "type": "tab",
+        "label": "PLC Data Publisher",
+        "disabled": false,
+        "info": "Flow để gửi dữ liệu PLC đến Railway app"
+    },
+    {
+        "id": "inject_timer",
+        "type": "inject",
+        "z": "plc_data_flow",
+        "name": "Timer 3s",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "3",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 120,
+        "y": 100,
+        "wires": [
+            [
+                "generate_plc_data"
+            ]
+        ]
+    },
+    {
+        "id": "generate_plc_data",
+        "type": "function",
+        "z": "plc_data_flow",
+        "name": "Generate PLC Data",
+        "func": "// Tạo dữ liệu PLC thực tế\nconst step = context.get('step') || 0;\ncontext.set('step', step + 1);\n\nconst time = step * 3;\nconst level = Math.floor(50 + 30 * Math.sin(time / 120));\nconst pressure = Number((1.0 + (level / 100) * 2.0).toFixed(1));\n\nconst data = {\n    Sensors_Level: level,\n    Sensors_Level_Per: level,\n    Sensors_Pressure: pressure,\n    Sensors_Pressure_Per: Math.floor(pressure / 4 * 100),\n    Running_Pump: level < 40 ? 1 : 0,\n    Valve_Solenoid: level < 60 ? 1 : 0,\n    Auto_Mode: true,\n    Manu_Mode: false,\n    Emergency: false,\n    Value_Vollt_Actual: level < 40 ? Number((8 + pressure * 1.5).toFixed(1)) : 0,\n    Stt_Start_Light_Green: level < 40 ? 1 : 0,\n    Stt_Stop_Light_Red: level < 40 ? 0 : 1,\n    Stt_EMG_Light_yellow: 0,\n    Level_Setpoint: 60,\n    Pressure_Setpoint: 2.5,\n    timestamp: new Date().toISOString()\n};\n\nnode.log(`Step ${step}: Level=${level}%, Pressure=${pressure}bar, Pump=${data.Running_Pump}`);\n\nmsg.payload = data;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 100,
+        "wires": [
+            [
+                "mqtt_out_hivemq",
+                "debug_output"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt_out_hivemq",
+        "type": "mqtt out",
+        "z": "plc_data_flow",
+        "name": "HiveMQ Cloud",
+        "topic": "plc/data",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "hivemq_broker",
+        "x": 580,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "debug_output",
+        "type": "debug",
+        "z": "plc_data_flow",
+        "name": "Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "hivemq_broker",
+        "type": "mqtt-broker",
+        "name": "HiveMQ Cloud Broker",
+        "broker": "d1e16dbebd9543efaa10c0b64795eca0.s1.eu.hivemq.cloud",
+        "port": "8883",
+        "tls": "hivemq_tls",
+        "clientid": "node_red_publisher",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": "",
+        "credentials": {
+            "user": "plc_gateway",
+            "password": "Abc12345@"
+        }
+    },
+    {
+        "id": "hivemq_tls",
+        "type": "tls-config",
+        "name": "HiveMQ TLS",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "d1e16dbebd9543efaa10c0b64795eca0.s1.eu.hivemq.cloud",
+        "verifyservercert": false,
+        "alpnprotocol": ""
+    }
+]

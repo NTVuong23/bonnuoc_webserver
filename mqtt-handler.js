@@ -55,10 +55,10 @@ function initMQTT(socketIo) {
   // Ưu tiên public broker cho test nếu không có credentials
   const hasCredentials = process.env.MQTT_USERNAME && process.env.MQTT_PASSWORD;
 
-  const mqttHost = process.env.MQTT_HOST || (hasCredentials ? 'e0e2df9662164c61b31be009996f5df6.s1.eu.hivemq.cloud' : 'broker.emqx.io');
+  const mqttHost = process.env.MQTT_HOST || (hasCredentials ? 'd1e16dbebd9543efaa10c0b64795eca0.s1.eu.hivemq.cloud' : 'broker.emqx.io');
   const mqttPort = process.env.MQTT_PORT || (hasCredentials ? '8883' : '1883');
-  const mqttUsername = process.env.MQTT_USERNAME || '';
-  const mqttPassword = process.env.MQTT_PASSWORD || '';
+  const mqttUsername = process.env.MQTT_USERNAME || 'plc_gateway';
+  const mqttPassword = process.env.MQTT_PASSWORD || 'Abc12345@';
   const mqttUseSSL = hasCredentials ? (process.env.MQTT_USE_SSL !== 'false') : false;
 
   const mqttUrl = `${mqttUseSSL ? 'mqtts' : 'mqtt'}://${mqttHost}:${mqttPort}`;
@@ -146,14 +146,22 @@ function initMQTT(socketIo) {
         }
       }, waitTime);
 
-      // Trên Railway, bắt đầu simulation ngay lập tức nếu không có dữ liệu sau 5 giây
+      // Trên Railway, bắt đầu simulation ngay lập tức nếu không có dữ liệu sau 3 giây
       if (isRailway) {
         setTimeout(() => {
           if (!dataReceived && !simulationMode) {
             console.log('🚀 Railway: Force start simulation mode để đảm bảo demo hoạt động');
             startSimulation();
           }
-        }, 5000);
+        }, 3000);
+      }
+
+      // Force simulation mode ngay lập tức nếu là Railway environment
+      if (isRailway && process.env.FORCE_SIMULATION === 'true') {
+        console.log('🎭 FORCE_SIMULATION=true: Bắt đầu simulation mode ngay lập tức');
+        setTimeout(() => {
+          startSimulation();
+        }, 1000);
       }
     });
     
