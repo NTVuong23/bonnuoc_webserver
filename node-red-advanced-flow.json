@@ -1,0 +1,65 @@
+[
+    {
+        "id": "advanced_plc_flow",
+        "type": "tab",
+        "label": "Advanced PLC Simulation",
+        "disabled": false,
+        "info": "Mô phỏng nâng cao với các scenario thực tế"
+    },
+    {
+        "id": "main_timer",
+        "type": "inject",
+        "z": "advanced_plc_flow",
+        "name": "Main Timer 3s",
+        "props": [{"p": "payload"}],
+        "repeat": "3",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 100,
+        "wires": [["realistic_plc_simulation"]]
+    },
+    {
+        "id": "realistic_plc_simulation",
+        "type": "function",
+        "z": "advanced_plc_flow",
+        "name": "Realistic PLC Simulation",
+        "func": "// ==================== HỆ THỐNG BỒN NƯỚC THỰC TẾ ====================\n\nconst step = context.get('step') || 0;\ncontext.set('step', step + 1);\n\n// ==================== TRẠNG THÁI HỆ THỐNG ====================\nlet state = context.get('systemState') || {\n    // Thông số vật lý\n    waterLevel: 45,        // % mức nước hiện tại\n    pressure: 1.8,         // bar áp suất hiện tại\n    temperature: 25,       // °C nhiệt độ nước\n    \n    // Trạng thái thiết bị\n    pumpRunning: false,\n    valveOpen: false,\n    autoMode: true,\n    emergency: false,\n    \n    // Thông số vận hành\n    pumpRunTime: 0,        // Thời gian bơm đã chạy (phút)\n    totalPumpCycles: 0,    // Số lần bơm đã chạy\n    lastMaintenanceHours: 0, // Giờ bảo trì cuối\n    \n    // Lịch sử hoạt động\n    dailyConsumption: 0,   // Lít tiêu thụ trong ngày\n    peakHours: false,      // Giờ cao điểm\n    \n    // Cảnh báo\n    alarmHistory: [],\n    lastAlarmTime: 0\n};\n\n// ==================== THÔNG SỐ VẬT LÝ THỰC TẾ ====================\nconst TANK = {\n    CAPACITY: 1000,        // Lít\n    HEIGHT: 3.0,           // Mét\n    DIAMETER: 1.5,         // Mét\n    MIN_LEVEL: 10,         // % mức tối thiểu\n    MAX_LEVEL: 95,         // % mức tối đa\n    CRITICAL_LOW: 15,      // % mức nguy hiểm thấp\n    CRITICAL_HIGH: 90      // % mức nguy hiểm cao\n};\n\nconst PUMP = {\n    FLOW_RATE: 50,         // Lít/phút\n    MAX_PRESSURE: 4.0,     // bar\n    RATED_VOLTAGE: 220,    // V\n    POWER_CONSUMPTION: 1.5, // kW\n    START_PRESSURE: 1.0,   // bar áp suất khởi động\n    STOP_PRESSURE: 2.8     // bar áp suất dừng\n};\n\nconst SYSTEM = {\n    UPDATE_INTERVAL: 3,    // giây\n    PRESSURE_PER_METER: 0.098, // bar/m (9.8 kPa/m)\n    AMBIENT_TEMP: 25,      // °C\n    TEMP_VARIATION: 5      // °C biến thiên\n};\n\n// ==================== TÍNH TOÁN TIÊU THỤ NƯỚC THEO GIỜ ====================\nconst currentHour = new Date().getHours();\nlet consumptionRate = 15; // Lít/phút cơ bản\n\n// Điều chỉnh theo giờ trong ngày\nif (currentHour >= 6 && currentHour <= 8) {\n    consumptionRate = 35; // Giờ sáng cao điểm\n    state.peakHours = true;\n} else if (currentHour >= 11 && currentHour <= 13) {\n    consumptionRate = 30; // Giờ trưa\n    state.peakHours = true;\n} else if (currentHour >= 17 && currentHour <= 20) {\n    consumptionRate = 40; // Giờ tối cao điểm\n    state.peakHours = true;\n} else if (currentHour >= 22 || currentHour <= 5) {\n    consumptionRate = 8;  // Giờ đêm thấp điểm\n    state.peakHours = false;\n} else {\n    state.peakHours = false;\n}\n\n// Thêm biến thiên ngẫu nhiên ±20%\nconsumptionRate *= (0.8 + Math.random() * 0.4);\n\n// ==================== TÍNH TOÁN THAY ĐỔI MỨC NƯỚC ====================\nlet levelChange = 0;\nconst timeStep = SYSTEM.UPDATE_INTERVAL / 60; // Chuyển sang phút\n\n// Nước vào từ bơm\nif (state.pumpRunning) {\n    const pumpFlow = PUMP.FLOW_RATE * timeStep;\n    levelChange += (pumpFlow / TANK.CAPACITY) * 100;\n    state.pumpRunTime += timeStep;\n}\n\n// Nước ra do tiêu thụ\nconst outFlow = consumptionRate * timeStep;\nlevelChange -= (outFlow / TANK.CAPACITY) * 100;\nstate.dailyConsumption += outFlow;\n\n// Cập nhật mức nước\nstate.waterLevel = Math.max(0, Math.min(100, state.waterLevel + levelChange));\n\n// ==================== TÍNH TOÁN ÁP SUẤT ====================\n// Áp suất tĩnh từ cột nước\nconst staticPressure = (state.waterLevel / 100) * TANK.HEIGHT * SYSTEM.PRESSURE_PER_METER;\n\n// Áp suất động từ bơm\nlet dynamicPressure = 0;\nif (state.pumpRunning) {\n    // Áp suất bơm phụ thuộc vào mức nước và hiệu suất\n    const pumpEfficiency = 0.8 + (state.waterLevel / 100) * 0.15; // 80-95%\n    dynamicPressure = 2.0 * pumpEfficiency;\n}\n\n// Tổng áp suất với nhiễu nhỏ\nstate.pressure = staticPressure + dynamicPressure + (Math.random() - 0.5) * 0.1;\nstate.pressure = Number(state.pressure.toFixed(2));\n\n// ==================== LOGIC ĐIỀU KHIỂN TỰ ĐỘNG ====================\nif (state.autoMode && !state.emergency) {\n    // Hysteresis control cho bơm\n    if (!state.pumpRunning) {\n        // Điều kiện bật bơm\n        if (state.waterLevel <= 25 || state.pressure <= PUMP.START_PRESSURE) {\n            state.pumpRunning = true;\n            state.totalPumpCycles++;\n            node.log(`🔵 Bơm BẬT: Level=${state.waterLevel.toFixed(1)}%, Pressure=${state.pressure}bar`);\n        }\n    } else {\n        // Điều kiện tắt bơm\n        if (state.waterLevel >= 75 && state.pressure >= PUMP.STOP_PRESSURE) {\n            state.pumpRunning = false;\n            node.log(`🔴 Bơm TẮT: Level=${state.waterLevel.toFixed(1)}%, Pressure=${state.pressure}bar`);\n        }\n    }\n    \n    // Điều khiển van\n    state.valveOpen = state.waterLevel < 70;\n}\n\n// ==================== TÍNH TOÁN NHIỆT ĐỘ ====================\nstate.temperature = SYSTEM.AMBIENT_TEMP + \n    (Math.sin(step / 20) * SYSTEM.TEMP_VARIATION) + \n    (Math.random() - 0.5) * 2;\nstate.temperature = Number(state.temperature.toFixed(1));\n\n// ==================== ĐIỆN ÁP VÀ CÔNG SUẤT ====================\nlet voltage = 0;\nlet current = 0;\nif (state.pumpRunning) {\n    // Điện áp dao động quanh 220V\n    voltage = PUMP.RATED_VOLTAGE + (state.pressure - 2.0) * 8 + (Math.random() - 0.5) * 15;\n    voltage = Math.max(200, Math.min(240, voltage));\n    \n    // Dòng điện phụ thuộc vào tải\n    current = (PUMP.POWER_CONSUMPTION * 1000) / voltage; // A\n    current *= (0.9 + state.pressure / 10); // Điều chỉnh theo áp suất\n}\n\n// ==================== HỆ THỐNG CẢNH BÁO ====================\nlet alarms = [];\n\n// Kiểm tra các điều kiện cảnh báo\nif (state.waterLevel <= TANK.CRITICAL_LOW) alarms.push('LOW_LEVEL');\nif (state.waterLevel >= TANK.CRITICAL_HIGH) alarms.push('HIGH_LEVEL');\nif (state.pressure > 3.5) alarms.push('OVER_PRESSURE');\nif (state.pressure < 0.5 && state.pumpRunning) alarms.push('LACK_PRESSURE');\nif (voltage > 235) alarms.push('OVER_VOLTAGE');\nif (voltage < 205 && state.pumpRunning) alarms.push('UNDER_VOLTAGE');\nif (state.temperature > 35) alarms.push('HIGH_TEMP');\nif (state.pumpRunTime > 60) alarms.push('PUMP_OVERRUN');\n\n// Cảnh báo bảo trì\nif (state.totalPumpCycles > 100 && (state.totalPumpCycles % 50) === 0) {\n    alarms.push('MAINTENANCE_DUE');\n}\n\n// Emergency ngẫu nhiên (1% cơ hội)\nif (Math.random() < 0.01) {\n    state.emergency = !state.emergency;\n    if (state.emergency) {\n        alarms.push('EMERGENCY_STOP');\n        state.pumpRunning = false;\n        state.valveOpen = false;\n    }\n}\n\n// Chuyển chế độ ngẫu nhiên (3% cơ hội)\nif (Math.random() < 0.03) {\n    state.autoMode = !state.autoMode;\n}\n\n// ==================== TẠO DỮ LIỆU OUTPUT ====================\nconst data = {\n    // Cảm biến chính\n    Sensors_Level: Math.round(state.waterLevel),\n    Sensors_Level_Per: Math.round(state.waterLevel),\n    Sensors_Pressure: state.pressure,\n    Sensors_Pressure_Per: Math.round((state.pressure / 4) * 100),\n    \n    // Dữ liệu đầu vào\n    Level_Input: Math.round(state.waterLevel),\n    Pressure_Input: state.pressure,\n    Level: Math.round(state.waterLevel),\n    Pressure: Math.round((state.pressure / 4) * 100),\n    \n    // Thiết bị\n    Running_Pump: state.pumpRunning ? 1 : 0,\n    Valve_Solenoid: state.valveOpen ? 1 : 0,\n    \n    // Chế độ\n    Auto_Mode: state.autoMode,\n    Manu_Mode: !state.autoMode,\n    status_Mode: state.autoMode ? 1 : 2,\n    Emergency: state.emergency,\n    \n    // Đèn báo\n    Stt_Start_Light_Green: state.pumpRunning ? 1 : 0,\n    Stt_Stop_Light_Red: state.pumpRunning ? 0 : 1,\n    Stt_EMG_Light_yellow: state.emergency ? 1 : 0,\n    \n    // Điện\n    Value_Vollt_Actual: Number(voltage.toFixed(1)),\n    Current_Actual: Number(current.toFixed(2)),\n    Power_Consumption: Number((voltage * current / 1000).toFixed(2)),\n    \n    // Setpoints\n    Level_Setpoint: 60,\n    Pressure_Setpoint: 2.5,\n    \n    // Cảnh báo\n    Over_Pressure: alarms.includes('OVER_PRESSURE') ? 1 : 0,\n    Lack_of_Pressure: alarms.includes('LACK_PRESSURE') ? 1 : 0,\n    Over_Voltage: alarms.includes('OVER_VOLTAGE') ? 1 : 0,\n    High_Level: alarms.includes('HIGH_LEVEL') ? 1 : 0,\n    Low_Level: alarms.includes('LOW_LEVEL') ? 1 : 0,\n    \n    // Thông tin bổ sung\n    Temperature: state.temperature,\n    Pump_Runtime: Number(state.pumpRunTime.toFixed(1)),\n    Daily_Consumption: Number(state.dailyConsumption.toFixed(1)),\n    Pump_Cycles: state.totalPumpCycles,\n    Peak_Hours: state.peakHours,\n    \n    timestamp: new Date().toISOString()\n};\n\n// Lưu trạng thái\ncontext.set('systemState', state);\n\n// Log chi tiết\nconst mode = state.autoMode ? 'AUTO' : 'MANUAL';\nconst emergency = state.emergency ? ' [EMERGENCY]' : '';\nconst peak = state.peakHours ? ' [PEAK]' : '';\nconst pumpStatus = state.pumpRunning ? 'ON' : 'OFF';\n\nnode.log(`Step ${step}: Level=${state.waterLevel.toFixed(1)}% (${levelChange > 0 ? '+' : ''}${levelChange.toFixed(2)}%), ` +\n         `Pressure=${state.pressure}bar, Pump=${pumpStatus}, Temp=${state.temperature}°C, ` +\n         `Mode=${mode}${emergency}${peak}`);\n\nif (alarms.length > 0) {\n    node.log(`🚨 ALARMS: ${alarms.join(', ')}`);\n}\n\nmsg.payload = data;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 380,
+        "y": 100,
+        "wires": [["mqtt_out_advanced", "debug_advanced"]]
+    },
+    {
+        "id": "mqtt_out_advanced",
+        "type": "mqtt out",
+        "z": "advanced_plc_flow",
+        "name": "HiveMQ Advanced",
+        "topic": "plc/data",
+        "qos": "1",
+        "retain": "false",
+        "broker": "hivemq_broker",
+        "x": 650,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "debug_advanced",
+        "type": "debug",
+        "z": "advanced_plc_flow",
+        "name": "Advanced Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 650,
+        "y": 160,
+        "wires": []
+    }
+]
