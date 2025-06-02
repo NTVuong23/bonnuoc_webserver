@@ -52,11 +52,14 @@ function initMQTT(socketIo) {
   // Cấu hình MQTT cho môi trường Railway
   const isRailway = process.env.RAILWAY_ENVIRONMENT === 'production' || process.env.NODE_ENV === 'production';
 
-  const mqttHost = process.env.MQTT_HOST || (isRailway ? 'broker.emqx.io' : 'broker.hivemq.com');
-  const mqttPort = process.env.MQTT_PORT || (isRailway ? '1883' : '1883');
+  // Ưu tiên public broker cho test nếu không có credentials
+  const hasCredentials = process.env.MQTT_USERNAME && process.env.MQTT_PASSWORD;
+
+  const mqttHost = process.env.MQTT_HOST || (hasCredentials ? 'e0e2df9662164c61b31be009996f5df6.s1.eu.hivemq.cloud' : 'broker.emqx.io');
+  const mqttPort = process.env.MQTT_PORT || (hasCredentials ? '8883' : '1883');
   const mqttUsername = process.env.MQTT_USERNAME || '';
   const mqttPassword = process.env.MQTT_PASSWORD || '';
-  const mqttUseSSL = process.env.MQTT_USE_SSL === 'true';
+  const mqttUseSSL = hasCredentials ? (process.env.MQTT_USE_SSL !== 'false') : false;
 
   const mqttUrl = `${mqttUseSSL ? 'mqtts' : 'mqtt'}://${mqttHost}:${mqttPort}`;
 
