@@ -3,8 +3,8 @@ const mqtt = require('mqtt');
 // Cấu hình MQTT - sử dụng cùng broker với Railway app
 const mqttHost = 'd1e16dbebd9543efaa10c0b64795eca0.s1.eu.hivemq.cloud';
 const mqttPort = '8883';
-const mqttUsername = process.env.MQTT_USERNAME || 'plc_gateway'; // Lấy từ environment hoặc thay bằng username thật
-const mqttPassword = process.env.MQTT_PASSWORD || 'Abc12345@'; // Lấy từ environment hoặc thay bằng password thật
+const mqttUsername = 'plc_gateway'; // Hardcode cho test
+const mqttPassword = 'Abc12345@'; // Hardcode cho test
 
 const mqttUrl = `mqtts://${mqttHost}:${mqttPort}`;
 
@@ -20,6 +20,14 @@ const mqttOptions = {
   keepalive: 60,
   clean: true
 };
+
+console.log('🔐 MQTT Options:', {
+  host: mqttHost,
+  port: mqttPort,
+  username: mqttUsername,
+  password: '***',
+  ssl: true
+});
 
 const client = mqtt.connect(mqttUrl, mqttOptions);
 

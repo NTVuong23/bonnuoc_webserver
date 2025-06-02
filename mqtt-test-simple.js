@@ -1,9 +1,12 @@
+console.log('🚀 Bắt đầu khởi tạo MQTT publisher...');
+
 const mqtt = require('mqtt');
 
 // Sử dụng public broker để test
 const mqttUrl = 'mqtt://broker.emqx.io:1883';
 
 console.log('🔗 Kết nối đến public MQTT broker:', mqttUrl);
+console.log('📦 MQTT library version:', require('mqtt/package.json').version);
 
 const client = mqtt.connect(mqttUrl, {
   clientId: `test_publisher_${Math.random().toString(16).slice(2, 8)}`,
