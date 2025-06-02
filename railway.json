@@ -1,0 +1,7 @@
+{  
+  "version": 2,  
+  "build": {  
+    "builder": "NIXPACKS"  
+  },  
+  "start": "node index.js"  
+} 

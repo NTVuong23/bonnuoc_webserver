@@ -1,0 +1,657 @@
+<html>
+    <!-- Phần Header của Website -->
+    <head>
+        <!-- ////////////// CHƯƠNG TRÌNH HỆ THỐNG //////////////  -->
+        <title>Hệ thống điều khiển áp suất bồn nước</title>
+        <script src = "socket.io/socket.io.js"></script>
+        <script src = "js/jquery-3.6.0.min.js"></script>
+        <script src = "js/plotly-2.8.3.min.js"></script>	
+        <script src = "js/FC1_Common.js"></script>
+        <script src = "js/FC8_Screen_Setting.js"></script>
+        <script src = "js/FC3_Screen_Alarm.js"></script>
+        <script src = "js/FC7_UserManagement.js"></script>
+        <script src = "js/FileSaver.js"></script>
+        <script src = "js/FC5_Notification.js"></script>
+        <script src = "js/FC4_Excel_Export.js"></script>
+        <script>
+            // Kết nối Socket.IO với URL hiện tại thay vì localhost cố định
+            var socket = io({
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                reconnectionAttempts: Infinity
+            });
+            
+            // Thêm handlers để theo dõi kết nối Socket.IO
+            socket.on('connect', function() {
+                console.log('Socket.IO đã kết nối! ID:', socket.id);
+                // Yêu cầu dữ liệu ngay khi kết nối
+                socket.emit("Client-send-data", "Yêu cầu dữ liệu ban đầu");
+            });
+            
+            socket.on('disconnect', function() {
+                console.log('Socket.IO đã ngắt kết nối');
+            });
+            
+            socket.on('connect_error', function(error) {
+                console.error('Lỗi kết nối Socket.IO:', error);
+            });
+            
+            socket.on('updatedata', function(data) {
+                console.log('Nhận dữ liệu tổng hợp từ server:', data);
+            });
+        </script>
+        <!-- ////////////// GỌI CÁC CSS //////////////  -->
+        <link rel="stylesheet" href= "CSS/slidebar.css">
+        <link rel="stylesheet" href= "CSS/screen_Home.css">
+        <link rel="stylesheet" href= "CSS/Screen_Monitoring.css">
+        <link rel="stylesheet" href= "CSS/screen_Manu.css">
+        <link rel="stylesheet" href= "CSS/screen_Auto.css">
+        <link rel="stylesheet" href= "CSS/screen_Alarm.css">
+        <link rel="stylesheet" href= "CSS/Screen_Trend.css">
+        <link rel="stylesheet" href= "CSS/screen_Setting.css">
+        <link rel="stylesheet" href= "CSS/login.css">
+        <link rel="stylesheet" href= "CSS/screen_IT5200.css">
+        
+    </head>
+    <!-- Phần thân của website -->
+    <body>
+        <!-- ////////////// Code cho slidebar////////////// -->
+        <div id = "slidebar">
+            <!--Nút chọn màn hình chính-->
+            <button id="btt_Screen_Home" onclick=" 
+                fn_ScreenChange('Screen_Home','Screen_IT5200','Screen_Monitoring','Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level');
+            "> <img src="images/Icons/Home.png" height="80"/> 
+            </button>  
+            <!--Nút chọn màn hình giám sát-->
+            <button id="btt_Screen_Monitoring" onclick=" 
+                fn_ScreenChange('Screen_Monitoring','Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200');
+            "><img src="images/Icons/Monitoring_4.png" height="80"/>
+            </button>
+            <!--Nút chọn màn tự động-->
+            <button id="btt_Screen_Auto" onclick=" 
+                fn_ScreenChange('Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring');
+            "><img src="images/Icons/control.png" height="80"/>
+            </button>  
+            <!--Nút chọn màn hình canh bao-->
+            <button id="btt_Screen_Alarm" onclick=" 
+                fn_Alarm_Show();
+                fn_ScreenChange('Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring','Screen_Auto','Screen_Manu','Screen_Setting_1');
+            "><img src="images/Icons/alarm.png" height="60"/>
+            </button>
+            <!--Nút chọn màn hình đồ thị-->
+            <button id="btt_Screen_Trend" onclick=" 
+                fn_ScreenChange('Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring','Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm');
+            "><img src="images/Icons/trend.png" height="60"/>
+            </button> 
+
+            <!--Nút đăng nhập/đăng xuất-->
+            <button id="btt_Login" class="btn" onclick="login();
+            window.location.reload();
+            "><img src="images/Icons/login.png" height="30"/>
+            <button id="btt_Logout" class="btn" onclick="logout();
+            "><img src="images/Icons/logout.png" height="30"/>
+               
+            </div>
+            <!-- //////////////Code cho màn hình chính////////////// -->
+            <div id = "Screen_Home">
+                <!-- <img id="back_scr_Home" src = "images/back_home.png" > -->
+                <header id="haeder_home">
+                    <img id="Logo_scr_home" src="images/hcmute.png" alt="Logo chính">
+                    <img id="Logo_scr_home_1" src="images/logo_1.png" alt="Logo phụ">
+                    <label id="showScreen"onclick="fn_ScreenChange('Screen_IT5200','Screen_Monitoring','Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home');">IT-5200 Infinit Technologies</label>
+                    <h2 id="Home_Text_7">TRƯỜNG ĐẠI HỌC SƯ PHẠM KỸ THUẬT TP. HỒ CHÍ MINH</h2>
+                </header>
+                <label id="Home_Text_1">Home</label>
+                <label id="Home_Text_2">Monitoring</label>
+                <label id="Home_Text_3">Configuration</label>
+                <label id="Home_Text_4">Trend</label>
+                <label id="Home_Text_5">Alarm</label>
+                <label id="Home_Text_11">CHUYÊN NGÀNH: CÔNG NGHỆ KĨ THUẬT ĐIỀU KHIỂN VÀ TỰ ĐỘNG HÓA</label>
+                <label id="Home_Text_12">ĐỒ ÁN TỐT NGHIỆP</label>
+                <label id="Home_Text_13">ĐỀ TÀI: HỆ THỐNG ỔN ĐỊNH MỰC NƯỚC VÀ ÁP SUẤT THEO THỜI GIAN</label>
+                <label id="Home_Text_14">GIÁO VIÊN HƯỚNG DẪN: PGS.TS TRƯƠNG ĐÌNH NHƠN</label>
+                <label id="Home_Text_15">SINH VIÊN THỰC HIỆN: PHAN THỊ HIỀN LƯƠNG</label>
+                <label id="Home_Text_16">CHÂU ĐẶNG MỴ NƯƠNG</label>
+                <label id="Home_Text_17">ĐIỀU KHIỂN PHÂN TẦNG</label>
+                <label id="Home_Text_18">KHOA ĐIỆN - ĐIỆN TỬ</label>
+            </div>
+            <!---//////////////////////code cho màn hình thông tin mô đun-->
+            <div id="Screen_IT5200">
+                <img id="IT5200_image" src="images\it5200.png">
+                <div id="header_IT5200">
+                    <label id="IT5200_Text_1">Thông tin bộ thí nghiệm</label>
+                    <label id="IT5200_Text_2">IT 5200 Infinit Technologies</label>
+                </div>
+                <p id="IT5200_Text_3">
+                    <br>Đặc tính thiết bị gồm có:</br>
+                    <br>- Nguồn DC cố định: ± 15</br>
+                    <br>- Thùng chứa: 5 lít<br/>
+                    <br>- Bể chứa nước: 20 lít<br/>
+                    <br>- Bơm tuần hoàn: 10 Ltr / phút<br/>
+                    <br>- Đường ống: Ống nhựa<br/>
+                    <br>- Cảm biến áp suất: Strain gauge, đọc trực tiếp qua áp kế<br/>
+                    <br>- Cảm biến mực nước: Cảm biến mực nước, đọc trực tiếp qua phao<br/> 
+                    <br>- Cảm biến lưu lượng: IR Opflow 8000 xung / Ltr, đọc trực tiếp qua phao</br>
+                    <br>- Van: Bằng tay, điều khiển bằng động cơ<br/>
+                    <br>- Điều khiển van động cơ: Điều khiển bật/tắt ± 10V<br/>
+                    <br>- Điều khiển van điện từ: Điều khiển bật/tắt<br/>
+                    <br>- Đường ống: Ống nhựa<br/>
+                    <br>- Cảm biến nhiệt: Pt100, đọc trực tiếp qua nhiệt kế<br/>
+                    <br>- Các đồng hồ đo<br/>  
+                </p>
+                <label id="IT5200_Text_4">Bộ thí nghiệm IT 5200 hãng Infinit Technologies</label>
+            </div>
+            <!-- //////////////Code cho màn hình Auto////////////// -->
+            <div id = "Screen_Monitoring">
+                <!-- Ảnh nền -->
+                <!-- <img id="Headder_scr_Moni" src = "images\BackGround\header_monitoring.png" > -->
+                <div id="header_Monitoring">
+                    <label id="Moni_Text_1">MÀN HÌNH GIÁM SÁT</label>
+                    <label id="Moni_Text_2">TRẠNG THÁI:</label>
+                    
+                </div>
+                <div id="Screen_Monitoring_1">
+                    <img id="back_scr_Moni_1" src = "images\BackGround\monitoring1.jpg" >
+                    <label id="Moni_Text_3">THÔNG SỐ GIÁM SÁT</label>
+                    <label id="Moni_Text_4">Đặt mức nước:</label>
+                    <label id="Moni_Text_5">[%]</label>
+                    <label id="Moni_Text_6">Áp suất:</label>
+                    <label id="Moni_Text_7">[Bar]</label>
+                    <label id="Moni_Text_8">Mức nước:</label>
+                    <label id="Moni_Text_9">[%]</label>
+                    <label id="Moni_Text_10">Điện áp bơm:</label>
+                    <label id="Moni_Text_11">[V]</label>
+                </div>
+                <div id="Screen_Monitoring_2">
+                    <img id="back_scr_Moni_2" src = "images\BackGround\process_tank.jpg" >  
+                </div>
+                <!-- //////////////HIỂN THỊ SYMBOL ////////////// -->
+                <!-- Tạo bơm có tên là Pump 1 -->
+                <img id = "scr_Moni_Pump" ><script> fn_SymbolStatus("scr_Moni_Pump", "Pump1", "Running_Pump") </script>
+                <!-- Tạo van có tên là Valve 1 -->
+                <img id = "scr_Moni_Valve" ><script> fn_SymbolStatus("scr_Moni_Valve", "Valve1", "Valve_Solenoid") </script>
+                <!-- Tạo cảm biến có tên là sensor1 -->
+                <img id = "scr_Moni_Sensor1" ><script> fn_SymbolStatus("scr_Moni_Sensor1", "sensor1", "Level") </script>
+                <!-- Tạo cảm biến có tên là sensor1 -->
+                <img id = "scr_Moni_Sensor2" ><script> fn_SymbolStatus("scr_Moni_Sensor2", "sensor2", "Pressure") </script>
+                <!-- Tạo status Mode -->
+                <img id = "scrMoni_Status_Mode" ><script> fn_SymbolStatus("scrMoni_Status_Mode", "stt_Mode", "status_Mode") </script>
+                <!-- //////////////HIỂN THỊ CÁC DATA IOFIELD ////////////// -->
+                <!-- Giá trị điểm đặt áp suất thực tế  -->
+                <input id="sp_Pressure" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Level_Setpoint", "sp_Pressure", 2)</script>
+                <!-- Giá trị áp suất thực tế  -->
+                <input id="act_Pressure" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Sensors_Pressure", "act_Pressure", 2)</script> 
+                <!-- Giá trị lưu lượng thực tế  -->
+                <input id="act_Flow" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Level_Input", "act_Flow", 2)</script>
+                <!-- Giá trị điện áp bơm  -->
+                <input id="act_Pump_Voltage" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Value_Vollt_Actual", "act_Pump_Voltage", 2)</script>
+            </div>
+            <!-- //////////////Code cho màn hình tự động////////////// -->
+            <div id = "Screen_Auto">
+                <!-- Ảnh nền -->
+                <!-- <img id="Headder_scr_Auto" src = "images\BackGround\header_scr_auto.png" > -->
+                <div id="header_Auto">
+                    <label id="Auto_Text_1">MÀN HÌNH ĐIỀU KHIỂN TỰ ĐỘNG</label>
+                    <label id="Auto_Text_2">TRẠNG THÁI:</label>
+                     <!-- Tạo status Mode -->
+                <img id = "scrAuto_Status_Mode" ><script> fn_SymbolStatus("scrAuto_Status_Mode", "stt_Mode", "status_Mode") </script>
+                </div>
+                <div id="Screen_Auto_1">
+                    <label id="Auto_Text_3">Trạng thái Van</label>
+                    <label id="Auto_Text_4">Trạng thái Bơm</label>
+                    <label id="Auto_Text_5">Dừng</label>
+                    <label id="Auto_Text_6">Chạy</label>
+                    <label id="Auto_Text_7">Khẩn cấp</label>
+                    <label id="Auto_Text_8">Quá áp suất</label>
+                    <label id="Auto_Text_9">Thiếu áp suất</label>
+                    <label id="Auto_Text_10">Quá điện áp</label>
+                        <!-- //////////////HIỂN THỊ SYMBOL ////////////// --> 
+                <!-- Tạo bơm -->
+                <img id = "scrAuto_Pump"> <script> fn_SymbolStatus("scrAuto_Pump", "pump2", "Running_Pump") </script>
+                <!-- Tạo van  -->
+                <img id = "scrAuto_Valve"><script> fn_SymbolStatus("scrAuto_Valve", "Valve2", "Valve_Solenoid") </script>
+                <!-- Tạo đèn báo stop -->
+                <img id = "scrAuto_stop"> <script> fn_SymbolStatus("scrAuto_stop", "stop1", "Stt_Stop_Light_Red") </script>
+                <!-- Tạo đèn báo start -->
+                <img id = "scrAuto_start"> <script> fn_SymbolStatus("scrAuto_start", "start1", "Stt_Start_Light_Green") </script>
+                <!-- Tạo đèn báo emergency -->
+                <img id = "scrAuto_emergency"> <script> fn_SymbolStatus("scrAuto_emergency", "emer1", "Stt_EMG_Light_yellow") </script>
+                <!-- Tạo mũi tên lên  -->
+                <img id = "scrAuto_Arow1"><script> fn_SymbolStatus("scrAuto_Arow1", "arow1", "Over_Pressure") </script>
+                <!-- Tạo mũi tên xuống  -->
+                <img id = "scrAuto_Arow2"><script> fn_SymbolStatus("scrAuto_Arow2", "arow2", "Lack_of_Pressure") </script>
+                <!-- Tạo đèn cảnh báo  -->
+                <img id = "scrAuto_Alarm1"><script> fn_SymbolStatus("scrAuto_Alarm1", "alarm1", "Over_Voltage") </script>
+                <!-- //////////////NÚT NHẤN ĐIỀU KHIỂN ////////////// -->
+                </div>
+                <div id="Screen_Auto_2">
+                    <label id="Auto_Text_11">Cài đặt thông số</label>
+                     <!-- setpoint -->
+                <label id="Setpoint">Set mức nước:</label>
+                  <!-- <button id="bttAuto_Set_Paramas" onclick= "fn_ScreenChange('Screen_Setting_1','Screen_Alarm','Screen_Trend','Screen_Home','Screen_Monitoring','Screen_Auto','Screen_Manu');">SETPOINT</button> -->
+                   <!-- Nút nhấn pid -->
+                   <button id="bttAuto_Set_Pid" onclick= "fn_ScreenChange('Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring','Screen_Auto','Screen_Manu');">PID</button>
+                   <!-- Nút nhấn chế độ tự động -->
+                <input id="ScrAuto_Setpoint_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrAuto_IOField_IO("Level_Setpoint", "ScrAuto_Setpoint_Level", 2);</script> 
+                <!--Nút nhấn sửa/lưu - Lưu ý: Nút nhấn lưu phải nằm trước nút nhấn sửa--> 
+                <button id="btt_scrAuto_Save_sp" onclick= "fn_scrAuto_SaveBtt()">Lưu</button> 
+                <button id="btt_scrAuto_Edit_sp" onclick= "fn_scrAuto_EditBtt()">Sửa</button>
+                </div>
+                <div id="Screen_Auto_3">
+                    <label id="Auto_Text_12">Bảng điều khiển</label>
+                   <button id="bttAuto_AutoMode" onclick= "socket.emit('cmd_Auto', true);">TỰ ĐỘNG</button>
+                   <!-- Nút nhấn chế độ bằng tay -->
+                   <button id="bttAuto_ManuMode" 
+                   onclick= "socket.emit('cmd_Manu', true);
+                   fn_ScreenChange('Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring','Screen_Auto');">THỦ CÔNG</button>
+                   <!-- Nút nhấn START -->
+                   <button id="bttAuto_Start" onclick= "socket.emit('cmd_Start', true);">Chạy</button>
+                   <!-- Nút nhấn STOP -->
+                   <button id="bttAuto_Stop" onclick= "socket.emit('cmd_Stop', true);">Dừng</button>
+                   <!-- Nút nhấn Emergency -->
+                   <button id="bttAuto_EMG" onclick= "socket.emit('cmd_EMG', true);">Khẩn cấp</button>
+                   <!-- Nút nhấn Reset Emergency -->
+                   <button id="bttAuto_Reset_EMG" onclick= "socket.emit('cmd_EMG', false);">Reset Khẩn Cấp</button>
+               </div>
+            </div>
+          
+            <!-- //////////////Code cho màn hình bằng tay////////////// -->
+            <div id = "Screen_Manu">
+                <!-- Ảnh nền -->
+                <!-- <img id="Headder_scr_Manu" src = "images\BackGround\header_scr_manu.png" > -->
+                <div id="header_Manu">
+                    <label id="Manu_Text_1">MÀN HÌNH ĐIỀU KHIỂN THỦ CÔNG</label>
+                    <label id="Manu_Text_2">TRẠNG THÁI:</label>
+                </div>              
+                 <!-- Tạo status Mode -->
+                 <img id = "scrManu_Status_Mode" ><script> fn_SymbolStatus("scrManu_Status_Mode", "stt_Mode", "status_Mode") </script>
+                <div id="Screen_Manu_1">
+                    <label id="Manu_Text_3">Trạng thái Van</label>
+                    <label id="Manu_Text_4">Trạng thái Bơm</label>
+                    <label id="Manu_Text_5">Chạy</label>
+                    <label id="manu_Text_6">Dừng</label>
+                    <label id="Manu_Text_7">Khẩn cấp</label>
+                    <label id="Manu_Text_8">Quá áp suất</label>
+                    <label id="Manu_Text_9">Thiếu áp suất</label>
+                    <label id="Manu_Text_10">Quá điện áp</label>
+                        <!-- //////////////HIỂN THỊ SYMBOL ////////////// --> 
+                <!-- Tạo bơm -->
+                <img id = "scrManu_Pump"> <script> fn_SymbolStatus("scrManu_Pump", "pump2", "Running_Pump") </script>
+                <!-- Tạo van  -->
+                <img id = "scrManu_Valve"><script> fn_SymbolStatus("scrManu_Valve", "Valve2", "Valve_Solenoid") </script>
+                <!-- Tạo đèn báo stop -->
+                <img id = "scrManu_stop"> <script> fn_SymbolStatus("scrManu_stop", "stop1", "Stt_Stop_Light_Red") </script>
+                <!-- Tạo đèn báo start -->
+                <img id = "scrManu_start"> <script> fn_SymbolStatus("scrManu_start", "start1", "Stt_Start_Light_Green") </script>
+                <!-- Tạo đèn báo emergency -->
+                <img id = "scrManu_emergency"> <script> fn_SymbolStatus("scrManu_emergency", "emer1", "Stt_EMG_Light_yellow") </script>
+                <!-- Tạo mũi tên lên  -->
+                <img id = "scrManu_Arow1"><script> fn_SymbolStatus("scrManu_Arow1", "stop1", "Over_Pressure") </script>
+                <!-- Tạo mũi tên xuống  -->
+                <img id = "scrManu_Arow2"><script> fn_SymbolStatus("scrManu_Arow2", "stop1", "Lack_of_Pressure") </script>
+                <!-- Tạo đèn cảnh báo  -->
+                <img id = "scrManu_Alarm1"><script> fn_SymbolStatus("scrManu_Alarm1", "alarm1", "Over_Voltage") </script>
+                <!-- //////////////NÚT NHẤN ĐIỀU KHIỂN ////////////// -->
+                </div>
+                <div id="Screen_Manu_2">
+                    <label id="Manu_Text_11">Cài đặt thông số</label>
+                     <!-- setpoint -->
+                <label id="Manu_Setpoint">Set mức nước:</label>
+                  <!-- <button id="bttAuto_Set_Paramas" onclick= "fn_ScreenChange('Screen_Setting_1','Screen_Alarm','Screen_Trend','Screen_Home','Screen_Monitoring','Screen_Auto','Screen_Manu');">SETPOINT</button> -->
+                   <!-- Nút nhấn pid -->
+                   <button id="bttManu_Set_Pid" onclick= "fn_ScreenChange('Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring','Screen_Auto','Screen_Manu');">PID</button>
+                   <!-- io field -->
+                <input id="ScrManu_Setpoint_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrAuto_IOField_IO("Level_Setpoint", "ScrManu_Setpoint_Level", 2);</script> 
+                <!--Nút nhấn sửa/lưu - Lưu ý: Nút nhấn lưu phải nằm trước nút nhấn sửa--> 
+                <button id="btt_scrManu_Save_sp" onclick= "fn_scrManu_SaveBtt()">Lưu</button> 
+                <button id="btt_scrManu_Edit_sp" onclick= "fn_scrManu_EditBtt()">Sửa</button>
+                </div>
+                <div id="Screen_Manu_3">
+                    <label id="Manu_Text_12">Bảng điều khiển</label>
+                    <label id="Manu_Text_13">Van:</label>
+                    <label id="Manu_Text_14">Bơm:</label>
+                   <button id="bttManu_AutoMode" onclick= "socket.emit('cmd_Auto', true);
+                   fn_ScreenChange('Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring');">TỰ ĐỘNG</button>
+                   <!-- Nút nhấn chế độ bằng tay -->
+                   <button id="bttManu_ManuMode" 
+                   onclick= "socket.emit('cmd_Manu', true);">THỦ CÔNG</button>
+                   <!-- Nút nhấn START -->
+                   <button id="bttManu_Start_Valve" onclick= "socket.emit('cmd_OpenV', true);">Chạy</button>
+                   <!-- Nút nhấn STOP -->
+                   <button id="bttManu_Stop_Valve" onclick= "socket.emit('cmd_CloseV', true);">Dừng</button>
+                    <!-- Nút nhấn START -->
+                    <button id="bttManu_Start_Pump" onclick= "socket.emit('cmd_RunP', true);">Chạy</button>
+                    <!-- Nút nhấn STOP -->
+                    <button id="bttManu_Stop_Pump" onclick= "socket.emit('cmd_StopP', true);">Dừng</button>
+                    <!-- Nút nhấn khẩn cấp -->
+                    <button id="bttManu_EMG" onclick= "socket.emit('cmd_EMG', true);">Khẩn cấp</button>
+                    <!-- Nút nhấn Reset Emergency -->
+                    <button id="bttManu_Reset_EMG" onclick= "socket.emit('cmd_EMG', false);">Reset Khẩn Cấp</button>
+               </div>
+            </div>
+            <!-- //////////////Code cho màn hình ghi dữ liệu xuống SQL////////////// -->
+            <div id = "Screen_Alarm">
+                <!-- <img src = "images/header_scr_alram.png" alt="Auto" style="width:1520px;height:50px;"> -->
+                <div id="header_Alarm">
+                    <label id="Alarm_Text_1">MÀN HÌNH CẢNH BÁO</label>
+                    <label id="Alarm_Text_2">TRẠNG THÁI:</label>
+                </div>
+                    <label id="Alarm_Text_3">BẢNG CẢNH BÁO LỖI HỆ THỐNG</label>
+                    <label id="Alarm_Text_4">TÌM KIẾM VÀ XUẤT</label>
+              
+                <div id="header_Alarm_4">
+                    <label id="Alarm_Text_5">Các cảnh báo trong bảng</label>
+                    <label id="Alarm_Text_6">1. Quá điện áp</label>
+                    <label id="Alarm_Text_7">2. Quá áp suất</label>
+                    <label id="Alarm_Text_8">3. Thiếu áp suất</label>
+                    <label id="Alarm_Text_9">4. Quá mức nước</label>
+                    <label id="Alarm_Text_10">5. Thiếu mức nước</label>
+                </div>
+                <!-- Tạo status Mode -->
+                <img id = "scrAlarm_Status_Mode" ><script> fn_SymbolStatus("scrAlarm_Status_Mode", "stt_Mode", "status_Mode") </script>
+                <!--Table Cảnh báo Alarm-->
+            <div id = "div_table_Alarm">
+                <table id="table_Alarm" >
+                    <thead>
+                    <tr>
+                        <th>Ngày tháng</th>
+                        <th>ID</th>
+                        <th>Trạng thái</th>
+                        <th>Cảnh báo</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="scr_Alarm_search">
+                <!--Date time piker-->
+                <label id="lb_AL_Search_Start">Từ:</label>
+                <input id="dtpk_AL_Search_Start" type="datetime-local">
+                <label id="lb_AL_Search_End">Đến:</label> 
+                <input id="dtpk_AL_Search_End" type="datetime-local">
+                <!--Nút tìm kiếm-->
+                <button id="btt_AL_Search" class="btn" onclick="fn_Alarm_By_Time();"></i> Tìm kiếm</button>
+                <script>fn_Alarm_By_Time_Display();</script>
+                <!--Nút Xuất Excel-->
+                <button id="btt_Excel_Alarm" class="btn" onclick="fn_excel_Alarm();"></i> Xuất</button>
+                <script>fn_excel_Alarm_Display();</script>
+            </div>
+
+            <!-- Notification System -->
+            <div id="notification-overlay" class="notification-overlay">
+                <div class="notification-container">
+                    <span id="notification-icon" class="notification-icon">⏳</span>
+                    <div id="notification-title" class="notification-title">Đang xử lý...</div>
+                    <div id="notification-message" class="notification-message">Vui lòng đợi trong giây lát</div>
+                    <button id="notification-button" class="notification-button" onclick="hideNotification()" style="display: none;">Đóng</button>
+                </div>
+            </div>
+            </div>
+            <!-- //////////////Code cho màn hình đồ thị////////////// -->
+            <div id = "Screen_Trend_Level">
+                <!-- <img id="header_scr_Trend" src = "images/header_trend.png" > -->
+                <div id="header_Trend_Level">
+                    <label id="Trend_Level_Text_1">MÀN HÌNH ĐỒ THỊ</label>
+                    <label id="Trend_Level_Text_2">TRẠNG THÁI:</label>
+                </div> 
+                <label id="Trend_Level_Text_5">Đáp ứng ngõ ra của mực nước</label>
+                <label id="Trend_Level_Text_6">Đáp ứng ngõ ra của áp suất</label>
+                <div id="div1_Trend_Level">
+                    <img id="div1_image" src = "images\Icons\water_icon.png" >
+                    <label id="div1_text1">Mực nước tham chiếu</label>
+                      <!-- io field -->
+                    <input id="ScrTrend_Setpoint_Level" disabled="disabled" type="text" /> 
+                    <script>fn_scrAuto_IOField_IO("Level_Setpoint", "ScrTrend_Setpoint_Level", 2);</script> 
+                </div> 
+                <div id="div2_Trend_Level">
+                    <img id="div2_image" src = "images\Icons\water_feedback.png" >
+                    <label id="div1_text2">Mực nước phản hồi</label>
+                     <!-- Giá trị mức nước thực tế  -->
+                <input id="ScrTrend_Actual_Level" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Level_Input", "ScrTrend_Actual_Level", 2)</script>
+                </div> 
+                <div id="div3_Trend_Level">
+                    <img id="div3_image" src = "images\Icons\pressure_icon.png" >
+                    <label id="div1_text4">Áp suất phản hồi</label>
+                         <!-- Giá trị áp suất thực tế  -->
+                <input id="ScrTrend_Actual_Pressure" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Sensors_Pressure", "ScrTrend_Actual_Pressure", 2)</script> 
+                </div> 
+                <div id="div4_Trend_Level">
+                    <img id="div4_image" src = "images\Icons\pump_voltage.png" >
+                    <label id="div1_text6">Điện áp bơm</label>
+                       <!-- Giá trị áp suất thực tế  -->
+                <input id="ScrTrend_Pump_Voltage" disabled="disabled" type="text" />
+                <script>fn_IOFieldDataShow("Value_Vollt_Actual", "ScrTrend_Pump_Voltage", 2)</script> 
+                </div> 
+                <!-- Tạo status Mode -->
+                <img id = "scrTrend_Level_Status_Mode" ><script> fn_SymbolStatus("scrTrend_Level_Status_Mode", "stt_Mode", "status_Mode") </script>
+                <div id="Screen_Trend_1">
+                    <label id="Trend_Level_Text_3">Mực nước (%)</label>
+                    <label id="Trend_Level_Text_4">Thời gian (s)</label>
+                    <!--REALTIME TREND--> 
+                    <script>
+                        //Lấy dữ liệu từ index gửi qua
+                        var data_trend_1 = 0;
+                        var data_trend_2 = 0;
+                        // var data_trend_3 = 0;
+                        socket.on("Level_Setpoint",function(data){
+                            data_trend_1 = data;
+                        });
+                        socket.on("Level_Input",function(data){
+                            data_trend_2 = data;
+                        });
+                       
+                        //Add traces
+                        Plotly.newPlot('Screen_Trend_1', [{
+                            y: [data_trend_1],
+                            name: 'Line 0: Mức nước tham chiếu',
+                            type: 'line',
+                            line: {
+                                color: 'rgb(0, 0, 0)',
+                                width: 2
+                            }
+                        }, {
+                            y: [data_trend_2],
+                            name: 'Line 1: Mức nước phản hồi',
+                            type: 'line',
+                            line: {
+                                color: 'rgb(255, 0, 0)',
+                                width: 2
+                            }
+                        }], {
+                            legend: {
+                                x: 0.7,
+                                y: 1.2
+                            }
+                        });
+
+                
+                        //ExtendTrakes
+                        var cnt = 0;
+                        setInterval(function(){
+                            Plotly.extendTraces('Screen_Trend_1',{ y:[[data_trend_1],[data_trend_2]]}, [0,1]);
+                            cnt++;
+                            if(cnt > 200) {
+                                Plotly.relayout('Screen_Trend_1',{
+                                    xaxis: {
+                                        range: [cnt-200,cnt]
+                                    }
+                                });
+                            }
+                        },1000);
+                    </script>
+                </div>
+                <div id="Screen_Trend_2">
+                    <!-- Nút nhấn Trend Pressure -->
+                    <label id="Trend_Pressure_Text_1">Thời gian (s)</label>
+                    <label id="Trend_Pressure_Text_2">Áp suất (%)</label>
+                    <script>
+                        //Lấy dữ liệu từ index gửi qua
+                        var data_trend_3 = 0;
+                        var data_trend_4 = 0;
+                        // var data_trend_3 = 0;
+                        socket.on("Pressure_Setpoint",function(data){
+                            data_trend_3 = data;
+                        });
+                        socket.on("Pressure_Input",function(data){
+                            data_trend_4 = data;
+                        });
+                       
+                       
+                        //Add traces
+                        Plotly.newPlot('Screen_Trend_2', [{
+                            y: [data_trend_3],
+                            name: 'Line 0: Áp suất tham chiếu',
+                            type: 'line',
+                            line: {
+                                color: 'rgb(0, 0, 0)',
+                                width: 2
+                            }
+                        }, {
+                            y: [data_trend_4],
+                            name: 'Line 1: Áp suất phản hồi',
+                            type: 'line',
+                            line: {
+                                color: 'rgb(255, 0, 0)',
+                                width: 2
+                            }
+                        }], {
+                            legend: {
+                                x: 0.7,
+                                y: 1.2
+                            }
+                        });
+                
+                        //ExtendTrakes
+                        var cnt = 0;
+                        setInterval(function(){
+                            Plotly.extendTraces('Screen_Trend_2',{ y:[[data_trend_3],[data_trend_4]]}, [0,1]);
+                            cnt++;
+                            if(cnt > 200) {
+                                Plotly.relayout('Screen_Trend_2',{
+                                    xaxis: {
+                                        range: [cnt-200,cnt]
+                                    }
+                                });
+                            }
+                        },1000);
+                    </script>
+                </div>
+            </div>
+              
+            <!-- //////////////Code cho màn hình cài đặt thông số////////////// -->
+            <div id = "Screen_Setting_1">
+                <!-- Ảnh nền -->
+                <div id="scr_setting1_header">
+                    <label id="Setting_Text_1">MÀN HÌNH CÀI ĐẶT THÔNG SỐ</label>
+                </div>
+                <!-- Ảnh nền -->
+                <img id="scr_Set_Params" src = "images/BackGround/set_para.jpg">
+                <button id="bttSetting_Exit" onclick= "fn_ScreenChange('Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_Home','Screen_IT5200','Screen_Monitoring');">X</button>
+                <!-- //////////////HIỂN THỊ CÁC DATA IOFIELD LEVEL ////////////// -->
+                <input id="set_PID_Gain_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Gain_Level", "set_PID_Gain_Level", 3);</script> 
+                <input id="set_PID_Ti_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Ti_Level", "set_PID_Ti_Level", 3);</script> 
+                <input id="set_PID_Td_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Td_Level", "set_PID_Td_Level", 3);</script> 
+                <input id="set_PID_TdFiltRatio_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("TdFiltRatio_Level", "set_PID_TdFiltRatio_Level", 3);</script> 
+                <input id="set_PID_PWeighting_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("PWeighting_Level", "set_PID_PWeighting_Level", 3);</script> 
+                <input id="set_PID_DWeighting_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("DWeighting_Level", "set_PID_DWeighting_Level", 3);</script> 
+                <input id="set_PID_Cycle_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Cycle_Level", "set_PID_Cycle_Level", 3);</script> 
+                <!-- //////////////HIỂN THỊ CÁC DATA IOFIELD PRESSURE////////////// -->
+                <input id="set_PID_Gain_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Gain_Pressure", "set_PID_Gain_Pressure", 3);</script> 
+                <input id="set_PID_Ti_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Ti_Pressure", "set_PID_Ti_Pressure", 3);</script> 
+                <input id="set_PID_Td_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Td_Pressure", "set_PID_Td_Pressure", 3);</script> 
+                <input id="set_PID_TdFiltRatio_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("TdFiltRatio_Pressure", "set_PID_TdFiltRatio_Pressure", 3);</script> 
+                <input id="set_PID_PWeighting_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("PWeighting_Pressure", "set_PID_PWeighting_Pressure", 3);</script> 
+                <input id="set_PID_DWeighting_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("DWeighting_Pressure", "set_PID_DWeighting_Pressure", 3);</script> 
+                <input id="set_PID_Cycle_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Cycle_Pressure", "set_PID_Cycle_Pressure", 3);</script> 
+                <!-- //////////////HIỂN THỊ CÁC DATA IOFIELD LEVEL RETAIN////////////// -->
+                <input id="Retain_PID_Gain_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Gain_Level_Retain", "Retain_PID_Gain_Level", 3);</script> 
+                <input id="Retain_PID_Ti_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Ti_Level_Retain", "Retain_PID_Ti_Level", 3);</script> 
+                <input id="Retain_PID_Td_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Td_Level_Retain", "Retain_PID_Td_Level", 3);</script> 
+                <input id="Retain_PID_TdFiltRatio_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("TdFiltRatio_Level_Retain", "Retain_PID_TdFiltRatio_Level", 3);</script> 
+                <input id="Retain_PID_PWeighting_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("PWeighting_Level_Retain", "Retain_PID_PWeighting_Level", 3);</script> 
+                <input id="Retain_PID_DWeighting_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("DWeighting_Level_Retain", "Retain_PID_DWeighting_Level", 3);</script> 
+                <input id="Retain_PID_Cycle_Level" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Cycle_Level_Retain", "Retain_PID_Cycle_Level", 3);</script> 
+                <!-- //////////////HIỂN THỊ CÁC DATA IOFIELD PRESSURE RETAIN////////////// -->
+                <input id="Retain_PID_Gain_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Gain_Pressure_Retain", "Retain_PID_Gain_Pressure", 3);</script> 
+                <input id="Retain_PID_Ti_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Ti_Pressure_Retain", "Retain_PID_Ti_Pressure", 3);</script> 
+                <input id="Retain_PID_Td_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Td_Pressure_Retain", "Retain_PID_Td_Pressure", 3);</script> 
+                <input id="Retain_PID_TdFiltRatio_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("TdFiltRatio_Pressure_Retain", "Retain_PID_TdFiltRatio_Pressure", 3);</script> 
+                <input id="Retain_PID_PWeighting_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("PWeighting_Pressure_Retain", "Retain_PID_PWeighting_Pressure", 3);</script> 
+                <input id="Retain_PID_DWeighting_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("DWeighting_Pressure_Retain", "Retain_PID_DWeighting_Pressure", 3);</script> 
+                <input id="Retain_PID_Cycle_Pressure" disabled="disabled" type="text" /> 
+                <script>fn_scrSet_PID_IOField_IO("Cycle_Pressure_Retain", "Retain_PID_Cycle_Pressure", 3);</script> 
+                <!--Nút nhấn sửa/lưu - Lưu ý: Nút nhấn lưu phải nằm trước nút nhấn sửa--> 
+                <button id="btt_scrSet_PID_Save" onclick= "fn_scrSet_PID_SaveBtt()">SAVE</button> 
+                <button id="btt_scrSet_PID_Edit" onclick= "fn_scrSet_PID_EditBtt()">EDIT</button>
+            </div>
+             <!-- ////////////// CHƯƠNG TRÌNH ĐĂNG NHẬP HỆ THỐNG //////////////  -->
+        <!-- <div id="div_login"> 
+            
+            <div id="id01" class="modal">
+                <form id = "modal-content1" class="modal-content animate">
+                <div id = "img_container" class="imgcontainer">
+                    <span id = "closebtt" onclick="document.getElementById('id01').style.display='none'; logout();" class="close" title="Close Modal">&times;</span>
+                    <img id = "img_avatar" src="images/logo.png" alt="Avatar" class="avatar">
+                </div>
+            
+                <div id = "log_container" class="container">
+                    <label for="uname"><b>Username</b></label>
+                    <input id = "inputuser" type="text" placeholder="Enter Username" name="uname" required>
+            
+                    <label for="psw"><b>Password</b></label>
+                    <input id = "inputpass" type="password" placeholder="Enter Password" name="psw" required>
+                    
+                    <button id = "bttlogin1" type="button" onclick="login();">Login</button>
+                    <label>
+                    <input type="checkbox" checked="checked" name="remember"> Remember acount
+                    </label>
+                </div>
+            
+                <div id = "login_container" class="container" style="background-color:#f1f1f1">
+                    <button id = "bttcancle" type="button" onclick="document.getElementById('id01').style.display='none'; logout();" class="cancelbtn">Cancel</button>
+                </div>
+                </form>
+            </div>
+        </div> -->
+        <script>
+            //Code chay khi load trang
+            fn_ScreenChange('Screen_Home','Screen_Auto','Screen_Manu','Screen_Setting_1','Screen_Alarm','Screen_Trend_Level','Screen_IT5200');
+        </script>
+        </body>
+    </html>
