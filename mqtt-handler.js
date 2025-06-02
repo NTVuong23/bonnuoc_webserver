@@ -21,12 +21,16 @@ const plcData = {
   Emergency: false,
   Auto_Mode: true, // Mặc định chế độ tự động
   Manu_Mode: false,
+  stt_Auto_Mode: 1, // Thêm thuộc tính này
+  stt_Manu_Mode: 0, // Thêm thuộc tính này
   Stt_Start_Light_Green: 0,
   Stt_Stop_Light_Red: 0, // Mặc định là 0 để không ở trạng thái dừng khi khởi động
   Stt_EMG_Light_yellow: 0,
   Over_Pressure: 0,
   Lack_of_Pressure: 0,
-  Over_Voltage: 0
+  Over_Voltage: 0,
+  High_Level: 0, // Thêm thuộc tính này
+  Low_Level: 0   // Thêm thuộc tính này
 };
 
 let mqttClient;
@@ -45,44 +49,80 @@ function initMQTT(socketIo) {
   plcData.Pressure = 0; // Áp suất ban đầu
   plcData.status_Mode = plcData.Manu_Mode ? 2 : (plcData.Auto_Mode ? 1 : 0); // Trạng thái chế độ
   
-  const mqttHost = process.env.MQTT_HOST || 'broker.hivemq.com';
-  const mqttPort = process.env.MQTT_PORT || '1883';
+  // Cấu hình MQTT cho môi trường Railway
+  const isRailway = process.env.RAILWAY_ENVIRONMENT === 'production' || process.env.NODE_ENV === 'production';
+
+  const mqttHost = process.env.MQTT_HOST || (isRailway ? 'broker.emqx.io' : 'broker.hivemq.com');
+  const mqttPort = process.env.MQTT_PORT || (isRailway ? '1883' : '1883');
   const mqttUsername = process.env.MQTT_USERNAME || '';
   const mqttPassword = process.env.MQTT_PASSWORD || '';
-  const mqttUseSSL = process.env.MQTT_USE_SSL === 'true'; // Mặc định là false cho test
+  const mqttUseSSL = process.env.MQTT_USE_SSL === 'true';
 
   const mqttUrl = `${mqttUseSSL ? 'mqtts' : 'mqtt'}://${mqttHost}:${mqttPort}`;
-  
-  console.log('Kết nối đến MQTT broker:', mqttUrl);
-  console.log('Sử dụng SSL:', mqttUseSSL);
+
+  console.log('🌐 Môi trường:', isRailway ? 'Railway (Production)' : 'Local (Development)');
+  console.log('🔗 Kết nối đến MQTT broker:', mqttUrl);
+  console.log('🔒 Sử dụng SSL:', mqttUseSSL);
+  console.log('👤 Username:', mqttUsername || 'Anonymous');
 
   const mqttOptions = {
     username: mqttUsername,
     password: mqttPassword,
     rejectUnauthorized: false,
     clientId: `bonnuoc_web_${Math.random().toString(16).slice(2, 8)}`,
-    connectTimeout: 5000
+    connectTimeout: isRailway ? 10000 : 5000, // Timeout dài hơn cho Railway
+    reconnectPeriod: 5000,
+    keepalive: 60,
+    clean: true,
+    will: {
+      topic: 'plc/status',
+      payload: JSON.stringify({ status: 'offline', clientId: `bonnuoc_web_${Math.random().toString(16).slice(2, 8)}` }),
+      qos: 1,
+      retain: false
+    }
   };
 
   try {
     mqttClient = mqtt.connect(mqttUrl, mqttOptions);
     
     mqttClient.on('connect', () => {
-      console.log('Đã kết nối đến MQTT Broker');
-      console.log('Đăng ký nhận dữ liệu từ topics: plc/data và plc/alarms');
-      mqttClient.subscribe('plc/data', { qos: 1 });
-      mqttClient.subscribe('plc/alarms', { qos: 1 });
+      console.log('✅ Đã kết nối đến MQTT Broker thành công!');
+      console.log('📡 Đăng ký nhận dữ liệu từ topics: plc/data và plc/alarms');
+
+      // Subscribe với error handling
+      mqttClient.subscribe('plc/data', { qos: 1 }, (err) => {
+        if (err) {
+          console.error('❌ Lỗi subscribe topic plc/data:', err);
+        } else {
+          console.log('✅ Subscribe topic plc/data thành công');
+        }
+      });
+
+      mqttClient.subscribe('plc/alarms', { qos: 1 }, (err) => {
+        if (err) {
+          console.error('❌ Lỗi subscribe topic plc/alarms:', err);
+        } else {
+          console.log('✅ Subscribe topic plc/alarms thành công');
+        }
+      });
 
       // Đăng ký với Node-RED gateway để bắt đầu nhận dữ liệu
-      console.log('Gửi yêu cầu dữ liệu đến gateway');
+      console.log('📤 Gửi yêu cầu dữ liệu đến gateway');
       mqttClient.publish('plc/request', JSON.stringify({
         action: 'subscribe',
-        clientId: mqttOptions.clientId
-      }), { qos: 1 });
+        clientId: mqttOptions.clientId,
+        timestamp: new Date().toISOString()
+      }), { qos: 1 }, (err) => {
+        if (err) {
+          console.error('❌ Lỗi gửi request đến gateway:', err);
+        } else {
+          console.log('✅ Gửi request đến gateway thành công');
+        }
+      });
 
       // Gửi dữ liệu ban đầu cho client thông qua Socket.IO
       if (io) {
-        console.log('Gửi dữ liệu ban đầu cho client');
+        console.log('📡 Gửi dữ liệu ban đầu cho client');
         io.emit('updatedata', plcData);
 
         // Phát riêng từng giá trị để kích hoạt các handler
@@ -93,13 +133,15 @@ function initMQTT(socketIo) {
         }
       }
 
-      // Bắt đầu simulation nếu không nhận được dữ liệu MQTT trong 10 giây
+      // Bắt đầu simulation nếu không nhận được dữ liệu MQTT trong thời gian quy định
+      const waitTime = isRailway ? 15000 : 10000; // Railway cần thời gian dài hơn
       setTimeout(() => {
         if (!dataReceived && !simulationMode) {
-          console.log('Không nhận được dữ liệu từ MQTT trong 10 giây, bắt đầu simulation...');
+          console.log(`⚠️ Không nhận được dữ liệu từ MQTT trong ${waitTime/1000} giây`);
+          console.log('🎭 Bắt đầu simulation mode để đảm bảo giao diện hoạt động...');
           startSimulation();
         }
-      }, 10000);
+      }, waitTime);
     });
     
     mqttClient.on('reconnect', () => {
@@ -522,20 +564,31 @@ function isConnected() {
   return mqttClient && mqttClient.connected;
 }
 
-// Hàm tạo dữ liệu giả lập
+// Biến để theo dõi trạng thái simulation
+let simulationStep = 0;
+
+// Hàm tạo dữ liệu giả lập thực tế cho Railway
 function generateSimulatedData() {
-  // Tạo giá trị ngẫu nhiên cho các thông số PLC
-  const level = Math.floor(Math.random() * 100);          // 0-100%
-  const pressureRaw = Math.random() * 4;                  // 0-4 bar
-  const pressure = Number(pressureRaw.toFixed(1));        // Định dạng 1 chữ số thập phân
-  const pressurePer = Math.floor(pressureRaw / 4 * 100);  // Phần trăm áp suất
+  simulationStep++;
 
-  // Giá trị boolean có xác suất thay đổi
-  const emergency = Math.random() < 0.05;                 // 5% cơ hội có emergency
-  const autoMode = Math.random() > 0.3;                   // 70% cơ hội ở auto mode
-  const manuMode = !autoMode;                             // Ngược với auto mode
+  // Tạo dữ liệu theo chu kỳ thực tế của hệ thống bồn nước
+  const time = simulationStep * 2; // Mỗi 2 giây
 
-  // Cập nhật dữ liệu giả lập
+  // Mức nước dao động từ 20% đến 80% theo chu kỳ
+  const level = Math.floor(50 + 30 * Math.sin(time / 60)); // Chu kỳ 2 phút
+
+  // Áp suất phụ thuộc vào mức nước và trạng thái bơm
+  let pressure = 0;
+  if (plcData.Running_Pump === 1) {
+    pressure = 1.5 + (level / 100) * 1.5; // 1.5-3.0 bar khi bơm chạy
+  } else {
+    pressure = 0.2 + (level / 100) * 0.8; // 0.2-1.0 bar khi bơm tắt
+  }
+  pressure = Number(pressure.toFixed(1));
+
+  const pressurePer = Math.floor(pressure / 4 * 100);
+
+  // Cập nhật dữ liệu cảm biến
   plcData.Sensors_Level = level;
   plcData.Sensors_Level_Per = level;
   plcData.Sensors_Pressure = pressure;
@@ -543,39 +596,64 @@ function generateSimulatedData() {
   plcData.Level_Input = level;
   plcData.Pressure_Input = pressure;
   plcData.Level = level;
-  plcData.Pressure = pressure;
-  plcData.Emergency = emergency;
-  plcData.Auto_Mode = autoMode;
-  plcData.Manu_Mode = manuMode;
+  plcData.Pressure = pressurePer;
 
-  // Logic điều khiển giả lập
-  if (!emergency) {
-    plcData.Running_Pump = pressure > 0.5 ? 1 : 0;
-    plcData.Valve_Solenoid = level < 50 ? 1 : 0;
-    plcData.Stt_Start_Light_Green = autoMode ? 1 : 0;
-    plcData.Stt_Stop_Light_Red = 0;
-    plcData.Value_Vollt_Actual = plcData.Running_Pump ? (2 + pressure * 4) : 0;
-  } else {
-    plcData.Running_Pump = 0;
-    plcData.Valve_Solenoid = 0;
-    plcData.Stt_Start_Light_Green = 0;
-    plcData.Stt_Stop_Light_Red = 1;
-    plcData.Value_Vollt_Actual = 0;
+  // Logic điều khiển tự động thực tế
+  if (!plcData.Emergency && plcData.Auto_Mode) {
+    // Bơm chạy khi mức nước < 30% hoặc áp suất < 1.0 bar
+    if (level < 30 || pressure < 1.0) {
+      plcData.Running_Pump = 1;
+      plcData.Stt_Start_Light_Green = 1;
+      plcData.Stt_Stop_Light_Red = 0;
+    }
+    // Bơm dừng khi mức nước > 70% và áp suất > 2.5 bar
+    else if (level > 70 && pressure > 2.5) {
+      plcData.Running_Pump = 0;
+      plcData.Stt_Start_Light_Green = 0;
+      plcData.Stt_Stop_Light_Red = 1;
+    }
+
+    // Van mở khi mức nước < 60%
+    plcData.Valve_Solenoid = level < 60 ? 1 : 0;
   }
 
-  // Cảnh báo
-  plcData.Over_Pressure = pressure > 3 ? 1 : 0;
-  plcData.Lack_of_Pressure = pressure < 0.5 ? 1 : 0;
-  plcData.Over_Voltage = plcData.Value_Vollt_Actual > 12 ? 1 : 0;
-  plcData.Stt_EMG_Light_yellow = emergency ? 1 : 0;
+  // Điện áp bơm phụ thuộc vào áp suất
+  plcData.Value_Vollt_Actual = plcData.Running_Pump ?
+    Number((8 + pressure * 1.5).toFixed(1)) : 0;
 
-  console.log('Dữ liệu giả lập được tạo:', plcData);
+  // Cảnh báo thực tế
+  plcData.Over_Pressure = pressure > 3.2 ? 1 : 0;
+  plcData.Lack_of_Pressure = pressure < 0.8 ? 1 : 0;
+  plcData.Over_Voltage = plcData.Value_Vollt_Actual > 13 ? 1 : 0;
+  plcData.High_Level = level > 90 ? 1 : 0;
+  plcData.Low_Level = level < 15 ? 1 : 0;
+
+  // Cập nhật trạng thái chế độ
+  plcData.status_Mode = plcData.Auto_Mode ? 1 : (plcData.Manu_Mode ? 2 : 0);
+  plcData.stt_Auto_Mode = plcData.Auto_Mode ? 1 : 0;
+  plcData.stt_Manu_Mode = plcData.Manu_Mode ? 1 : 0;
+
+  // Cập nhật tag_Obj cho alarm system
+  if (typeof global !== 'undefined' && global.tag_Obj) {
+    global.tag_Obj.Over_Pressure = plcData.Over_Pressure;
+    global.tag_Obj.Lack_of_Pressure = plcData.Lack_of_Pressure;
+    global.tag_Obj.Over_Voltage = plcData.Over_Voltage;
+    global.tag_Obj.High_Level = plcData.High_Level;
+    global.tag_Obj.Low_Level = plcData.Low_Level;
+
+    // Gọi hàm xử lý alarm
+    if (typeof global.fn_Alarm_Manage === 'function') {
+      global.fn_Alarm_Manage();
+    }
+  }
+
+  console.log(`🎭 Simulation Step ${simulationStep}: Level=${level}%, Pressure=${pressure}bar, Pump=${plcData.Running_Pump}`);
 
   // Gửi dữ liệu đến client
   if (io) {
     io.emit('updatedata', plcData);
 
-    // Phát riêng từng giá trị
+    // Phát riêng từng giá trị để kích hoạt handlers
     for (const key in plcData) {
       if (Object.prototype.hasOwnProperty.call(plcData, key)) {
         io.emit(key, plcData[key]);
