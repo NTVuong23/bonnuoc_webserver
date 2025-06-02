@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "mqtt-publisher": "node mqtt-test-publisher.js",
+    "mqtt-test": "MQTT_USERNAME=your_username MQTT_PASSWORD=your_password node mqtt-test-publisher.js"
   },
   "author": "",
   "license": "ISC",

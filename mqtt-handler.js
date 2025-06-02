@@ -175,12 +175,25 @@ function initMQTT(socketIo) {
 // Xử lý tin nhắn MQTT
 function handleMQTTMessage(topic, message) {
   try {
-    console.log(`Nhận tin nhắn từ topic ${topic}:`, message.toString());
+    console.log(`📥 Nhận tin nhắn từ topic ${topic}:`, message.toString().substring(0, 200) + '...');
     const data = JSON.parse(message.toString());
 
     if (topic === 'plc/data') {
       // Đánh dấu đã nhận được dữ liệu từ MQTT
       dataReceived = true;
+
+      // Dừng simulation mode nếu đang chạy
+      if (simulationMode) {
+        console.log('🎯 Nhận được dữ liệu MQTT thật, dừng simulation mode...');
+        stopSimulation();
+      }
+
+      console.log('✅ Dữ liệu MQTT nhận được:', {
+        level: data.Sensors_Level,
+        pressure: data.Sensors_Pressure,
+        pump: data.Running_Pump,
+        timestamp: data.timestamp
+      });
       // Kiểm tra xem có đang ở trạng thái khẩn cấp không (bỏ kiểm tra Stt_Stop_Light_Red)
       if (plcData.Emergency == true) {
         console.log('Hệ thống đang ở trạng thái khẩn cấp, bỏ qua cập nhật dữ liệu');
