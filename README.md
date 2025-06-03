@@ -106,6 +106,11 @@ npm install
 - Tạo database MySQL tên `SQL_PLC`
 - Bảng `alarm` sẽ được tạo tự động
 
+4. **Start MQTT**
+```bash
+node-red
+```
+
 4. **Start server**
 ```bash
 npm start

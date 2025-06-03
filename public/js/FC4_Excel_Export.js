@@ -43,14 +43,19 @@ function fn_excel_Alarm_Display(){
                 throw new Error('Thông tin file không hợp lệ');
             }
 
-            console.log('📄 File Excel được tạo:', bookname);
+            // Xác định loại file
+            const isCSV = bookname.toLowerCase().endsWith('.csv');
+            const fileType = isCSV ? 'CSV' : 'Excel';
+            const fileIcon = isCSV ? '📊' : '📈';
+
+            console.log(`${fileIcon} File ${fileType} được tạo:`, bookname);
             console.log('📂 Đường dẫn:', linktext);
             console.log('📊 Kích thước:', fileSize);
 
             // Cập nhật notification
             updateNotification(
                 'Đang tải file...',
-                `File ${bookname} đã được tạo thành công. Đang chuẩn bị tải xuống...`
+                `File ${fileType} ${bookname} đã được tạo thành công. Đang chuẩn bị tải xuống...`
             );
 
             // Delay trước khi download
@@ -71,12 +76,12 @@ function fn_excel_Alarm_Display(){
                     link.click();
                     document.body.removeChild(link);
 
-                    console.log('✅ Đã trigger download file Excel');
+                    console.log(`✅ Đã trigger download file ${fileType}`);
 
                     // Hiển thị thông báo thành công
                     const currentTime = formatDateTime(new Date());
                     showSuccessNotification(
-                        'Xuất file Excel thành công!',
+                        `${fileIcon} Xuất file ${fileType} thành công!`,
                         `File "${bookname}" đã được tạo và tải xuống.\nThời gian: ${currentTime}\nKích thước: ${fileSize}`,
                         true
                     );

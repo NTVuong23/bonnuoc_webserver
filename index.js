@@ -547,6 +547,8 @@ io.on('connection', function(socket) {
   socket.on("msg.Excel_Report_Alarm", async function(data) {
     console.log('🔥 Nhận yêu cầu xuất Excel từ client:', socket.id);
     console.log('📋 Request data:', data);
+    console.log('🌐 Environment:', process.env.NODE_ENV || 'development');
+    console.log('📁 Current working directory:', process.cwd());
 
     try {
       // Kiểm tra dữ liệu trước khi xuất - nếu không có dữ liệu thì tạo dữ liệu mẫu
@@ -575,7 +577,17 @@ io.on('connection', function(socket) {
 
       console.log(`📊 Đang xuất ${SQL_Excel_Alarm.length} bản ghi cảnh báo...`);
 
+      // Kiểm tra ExcelJS library
+      try {
+        const Excel = require('exceljs');
+        console.log('✅ ExcelJS library loaded successfully');
+      } catch (excelError) {
+        console.error('❌ Lỗi load ExcelJS library:', excelError);
+        throw new Error('ExcelJS library không khả dụng trên môi trường này');
+      }
+
       // Gọi hàm tạo Excel với xử lý lỗi
+      console.log('🔧 Bắt đầu gọi fn_excelExport_Alarm()...');
       const result = await fn_excelExport_Alarm();
 
       if (!result || result.length < 2 || !result[0] || !result[1]) {
@@ -614,6 +626,19 @@ io.on('connection', function(socket) {
 
     } catch (error) {
       console.error('❌ Lỗi khi tạo file Excel:', error);
+      console.log('🔄 Thử tạo file CSV thay thế...');
+
+      try {
+        // Fallback: Tạo file CSV
+        const csvResult = await createCSVReport();
+        if (csvResult) {
+          console.log('✅ Đã tạo file CSV thành công');
+          socket.emit('send_Excel_Report_Alarm', csvResult);
+          return;
+        }
+      } catch (csvError) {
+        console.error('❌ Lỗi khi tạo file CSV:', csvError);
+      }
 
       // Gửi thông báo lỗi về client
       socket.emit('send_Excel_Report_Alarm_Error', {
@@ -848,6 +873,72 @@ function formatFileSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Hàm tạo file CSV thay thế cho Excel (Railway fallback)
+async function createCSVReport() {
+    try {
+        const fs = require('fs');
+        const path = require('path');
+
+        // Tạo thư mục Report nếu chưa có
+        const reportDir = path.join(__dirname, 'public', 'Report');
+        if (!fs.existsSync(reportDir)) {
+            fs.mkdirSync(reportDir, { recursive: true });
+            console.log('📁 Đã tạo thư mục Report cho CSV');
+        }
+
+        // Tạo tên file
+        let date_ob = new Date();
+        let date = ("0" + date_ob.getDate()).slice(-2);
+        let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+        let year = date_ob.getFullYear();
+        let hours = date_ob.getHours();
+        let minutes = date_ob.getMinutes();
+        let seconds = date_ob.getSeconds();
+
+        const currentTime = year + "_" + month + "_" + date + "_" + hours + "h" + minutes + "m" + seconds + "s";
+        const fileName = "Report_" + currentTime + ".csv";
+        const savePath = "Report/" + fileName;
+        const fullPath = path.join(__dirname, 'public', savePath);
+
+        // Tạo nội dung CSV
+        let csvContent = '';
+
+        // Header
+        csvContent += 'STT,Thời gian,ID,Trạng thái,Tên cảnh báo\n';
+
+        // Dữ liệu
+        SQL_Excel_Alarm.forEach((row, index) => {
+            const csvRow = [
+                index + 1,
+                `"${row.date_time || ''}"`,
+                `"${row.ID || ''}"`,
+                `"${row.Status || ''}"`,
+                `"${row.AlarmName || ''}"`
+            ].join(',');
+            csvContent += csvRow + '\n';
+        });
+
+        // Ghi file
+        fs.writeFileSync(fullPath, '\uFEFF' + csvContent, 'utf8'); // \uFEFF for UTF-8 BOM
+        console.log('✅ File CSV đã được tạo:', fullPath);
+
+        // Kiểm tra file
+        if (fs.existsSync(fullPath)) {
+            const stats = fs.statSync(fullPath);
+            const fileSize = formatFileSize(stats.size);
+            console.log(`📊 Kích thước file CSV: ${fileSize}`);
+
+            return [savePath, fileName, fileSize];
+        } else {
+            throw new Error('File CSV không được tạo thành công');
+        }
+
+    } catch (error) {
+        console.error('❌ Lỗi tạo file CSV:', error);
+        throw error;
+    }
 }
 
 async function fn_excelExport_Alarm(){
